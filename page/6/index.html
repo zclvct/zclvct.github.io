@@ -29,125 +29,121 @@
       switchTab();
       window.addEventListener('hashchange', switchTab, false);
   })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:31.831Z" title="2025/5/16 11:12:31">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">26 分钟读完 (大约3902个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%BD%8E%E5%BB%B6%E8%BF%9F%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/">低延迟垃圾收集器</a></p><div class="content"><p>[TOC]</p>
-<p>下图中浅色阶段表示必须挂起用户线程，深色表示收集器线程与用户线程是并发工作的。</p>
-<p>在CMS和G1之前的全部收集器，其工作的所有步骤都会产生“Stop The World”式的停顿； CMS和G1分别使用增量更新和原始快照技术，实现了标记阶段的并发，不会因管理的堆内存变大，要标记的对象变多而导致停顿时间随之增长。但是对于标记阶段之后的处理，仍未得到妥善解决。<br><strong>CMS使用标记-清除算法，虽然避免了整理阶段收集器带来的停顿，但是清除算法不论如何 化改进，在设计原理上避免不了空间碎片的产生，随着空间碎片不断淤积最终依然逃不过“Stop The World”的命运</strong>。<br><strong>G1虽然可以按更小的粒度进行回收，从而抑制整理阶段出现时间过长的停顿，但毕竟 也还是要暂停的</strong>。</p>
-<p><img src="/media/17321588916542/17321596868873.jpg"></p>
-<h1 id="Shenandoah-谢南多亚-收集器"><a href="#Shenandoah-谢南多亚-收集器" class="headerlink" title="Shenandoah(谢南多亚)收集器"></a>Shenandoah(谢南多亚)收集器</h1><p>Shenandoah也是使用基于Region的堆内存布局，同样 有着用于存放大对象的Humongous Region，默认的回收策略也同样是优先处理回收价值最大的 Region……但在管理堆内存方面，它与G1至少有三个明显的不同之处.</p>
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:14:22.828Z" title="2025/5/16 11:14:22">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">15 分钟读完 (大约2178个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/Java%E6%A8%A1%E5%9D%97%E5%8C%96%E7%B3%BB%E7%BB%9F/">Java模块化系统</a></p><div class="content"><p>[TOC]</p>
+<p>在JDK 9中引入的Java模块化系统（Java Platform Module System，JPMS）是对Java技术的一次重要升级，为了能够实现模块化的关键目标——可配置的封装隔离机制，Java虚拟机对类加载架构也做 出了相应的变动调整，才使模块化系统得以顺利地运作。JDK 9的模块不仅仅像之前的JAR包那样只是简单地充当代码的容器，除了代码外，Java的模块定义还包含以下内容：</p>
+<ul>
+<li>依赖其他模块的列表。</li>
+<li>导出的包列表，即其他模块可以使用的列表。</li>
+<li>开放的包列表，即其他模块可反射访问模块的列表。</li>
+<li>使用的服务列表。</li>
+<li>提供服务的实现列表。</li>
+</ul>
+<p>可配置的封装隔离机制首先要解决JDK9之前基于类路径（ClassPath）来查找依赖的可靠性问题。<strong>此前，如果类路径中缺失了运行时依赖的类型，那就只能等程序运行到发生该类型的加载、链接 时才会报出运行的异常</strong>。<strong>而在JDK 9以后，如果启用了模块化进行封装，模块就可以声明对其他模块的显式依赖，这样Java虚拟机就能够在启动时验证应用程序开发阶段设定好的依赖关系在运行期是否完备，如有缺失那就直接启动失败，从而避免了很大一部分由于类型依赖而引发的运行时异常</strong>。</p>
+<p>可配置的封装隔离机制还解决了原来类路径上跨JAR文件的public类型的可访问性问题。JDK9中的 ublic类型不再意味着程序的所有地方的代码都可以随意访问到它们，模块提供了更精细的可访问性控制，必须明确声明其中哪一些public的类型可以被其他哪一些模块访问，这种访问控制也主要是在类载过程中完成的。</p>
+<h2 id="解决的问题"><a href="#解决的问题" class="headerlink" title="解决的问题"></a>解决的问题</h2><p>Java 9 引入的模块化系统（Module System）主要解决了以下几个关键问题：</p>
 <ol>
-<li>支持并发的整理算法,G1的回收阶段是可以多线程并行的，但却不能与用户线程并发.</li>
-<li>Shenandoah（目前）是默认不使用分代收集的，换言之，不会有 专门的新生代Region或者老年代Region的存在，没有实现分代，并不是说分代对Shenandoah没有价值， 这更多是出于性价比的权衡，基于工作量上的考虑而将其放到优先级较低的位置上.</li>
-<li>Shenandoah摒弃了在G1中耗费大量内存和计算资源去维护的记忆集，改用名为“连接矩阵”（Connection Matrix）的全局数据结构来记录跨Region的引用关系，降低了处理跨代指针时的记忆集维护消耗，也降低了伪共享问题的发生概率.</li>
+<li>类路径地狱（ClassPath Hell）</li>
 </ol>
-<p><img src="/media/17321588916542/17321668602765.jpg"></p>
+<p>在传统的 Java 应用程序中，类路径（ClassPath）管理非常复杂，尤其是在大型项目中。类路径地狱指的是由于类路径配置不当导致的类加载问题，例如：</p>
 <ul>
-<li><p>初始标记（Initial Marking）：</p>
-<p>  与G1一样，首先标记与GC Roots直接关联的对象，这个阶段仍是“Stop The World”的，但停顿时间与堆大小无关，只与GC Roots的数量相关。</p>
-</li>
-<li><p>并发标记（Concurrent Marking）：</p>
-<p>  与G1一样，遍历对象图，标记出全部可达的对象，这个阶段是与用户线程一起并发的，时间长短取决于堆中存活对象的数量以及对象图的结构复杂程度。</p>
-</li>
-<li><p>最终标记（Final M arking）：</p>
-<p>  与G1一样，处理剩余的SATB扫描，并在这个阶段统计出回收价值 最高的Region，将这些Region构成一组回收集（Collection Set）。最终标记阶段也会有一小段短暂的停顿。</p>
-</li>
-<li><p>并发清理（Concurrent Cleanup ）：</p>
-<p>  这个阶段用于清理那些整个区域内连一个存活对象都没有找到的Region（这类Region被称为Immediate Garbage Region)。</p>
-</li>
-<li><p>并发回收（Concurrent Evacuation）：</p>
-<p>  并发回收阶段是Shenandoah与之前HotSpot中其他收集器的核心差异。在这个阶段，Shenandoah要把回收集里面的存活对象先复制一份到其他未被使用的Region之中。复制对象这件事情如果将用户线程冻结起来再做那是相当简单的，但如果两者必须要同时并发进行的话，就变得复杂起来了。其困难点是在移动对象的同时，用户线程仍然可能不停对被移动的对象 进行读写访问，移动对象是一次性的行为，但移动之后整个内存中所有指向该对象的引用都还是旧对象的地址，这是很难一瞬间全部改变过来的。对于并发回收阶段遇到的这些困难，Shenandoah将会通过读屏障和被称为“Brooks Pointers”的转发指针来解决。并发回收阶段运行的时间长短取决于回收集的大小。</p>
-</li>
-<li><p>初始引用更新（Initial Update Reference）：</p>
-<p>  并发回收阶段复制对象结束后，还需要把堆中所有指向旧对象的引用修正到复制后的新地址，这个操作称为引用更新。引用更新的初始化阶段实际上并未做什么具体的处理，设立这个阶段只是为了建立一个线程集合点，确保所有并发回收阶段中进行的收集器线程都已完成分配给它们的对象移动任务而已。初始引用更新时间很短，会产生一个非常短暂的停顿。</p>
-</li>
-<li><p>并发引用更新（Concurrent Update Reference）：</p>
-<p>  真正开始进行引用更新操作，这个阶段是与用户线程一起并发的，时间长短取决于内存中涉及的引用数量的多少。并发引用更新与并发标记不同，它不再需要沿着对象图来搜索，只需要按照内存物理地址的顺序，线性地搜索出引用类型，把旧值改为新值即可。</p>
-</li>
-<li><p>最终引用更新（Final Update Reference）：</p>
-<p>  解决了堆中的引用更新后，还要修正存在于GC Roots 中的引用。这个阶段是Shenandoah的最后一次停顿，停顿时间只与GC Roots的数量相关。</p>
-</li>
-<li><p>并发清理（Concurrent Cleanup ）：</p>
-<p>  经过并发回收和引用更新之后，整个回收集中所有的Region已再无存活对象，这些Region都变成Immediate Garbage Regions了，最后再调用一次并发清理过程来回收 这些Region的内存空间，供以后新对象分配使用。</p>
-</li>
+<li>重复的类：多个JAR文件中包含同名类，导致类加载冲突。</li>
+<li>缺失的类：类路径中缺少必要的类文件，导致 ClassNotFoundException 或 NoClassDefFoundError。</li>
+<li>版本冲突：不同库依赖于不同版本的相同类，导致兼容性问题。</li>
 </ul>
-<p><img src="/media/17321588916542/17321669915068.jpg"></p>
-<p><img src="/media/17321588916542/17321690862577.jpg"></p>
-<h2 id="ZGC收集器"><a href="#ZGC收集器" class="headerlink" title="ZGC收集器"></a>ZGC收集器</h2><p>ZGC和Shenandoah的目标是高度相似的，都希望在尽可能对吞吐量影响不太大的前提下，实现在任意堆内存大小下都可以把垃圾收集的停顿时间限制在十毫秒以内的低延迟。</p>
-<p>ZGC也采用基于Region的堆内存布局，但与它们不同的是，ZGC的Region（在一些官方资料中将它称为Page或者ZPage）具有动态性——动态创建和销毁，以及动态的区域容量大小。在x64硬件平台下，ZGC的 Region可以具有如图3-19所示的大、中、小三类容量：</p>
-<ul>
-<li>小型Region（Small Region）：容量固定为2MB，用于放置小于256KB的小对象。</li>
-<li>中型Region（Medium Region）：容量固定为32MB，用于放置大于等于256KB但小于4M B的对 象。</li>
-<li>大型Region（Large Region）：容量不固定，可以动态变化，但必须为2MB的整数倍，用于放置4M B或以上的大对象。每个大型Region中只会存放一个大对象，这也预示着虽然名字叫作“大型Region”，但它的实际容量完全有可能小于中型Region，最小容量可低至4MB。大型Region在ZGC的实现中是不会被重分配的，因为复制一个大对象的代价非常高昂。</li>
-</ul>
-<p><img src="/media/17321588916542/17321713938602.jpg"></p>
-<p>ZGC收集器有一个标志性的设计是它采用的染色指针技术（Colored Pointer，其他类似的技术中可 能将它称为Tag Pointer或者Version Pointer）<br><img src="/media/17321588916542/17321718622056.jpg"></p>
-<ul>
-<li><p>染色指针可以使得一旦某个Region的存活对象被移走之后，这个Region立即就能够被释放和重用掉，而不必等待整个堆中所有指向该Region的引用都被修正后才能清理。这点相比起Shenandoah是一个颇大的优势，使得理论上只要还有一个空闲Region，ZGC就能完成收集，而Shenandoah需要等到引用 更新阶段结束以后才能释放回收集中的Region，这意味着堆中几乎所有对象都存活的极端情况，需要 1∶1复制对象到新Region的话，就必须要有一半的空闲Region来完成收集。至于为什么染色指针能够导致这样的结果，笔者将在后续解释其“自愈”特性的时候进行解释。</p>
-</li>
-<li><p>染色指针可以大幅减少在垃圾收集过程中内存屏障的使用数量，设置内存屏障，尤其是写屏障的 目的通常是为了记录对象引用的变动情况，如果将这些信息直接维护在指针中，显然就可以省去一些 专门的记录操作。实际上，到目前为止ZGC都并未使用任何写屏障，只使用了读屏障（一部分是染色指针的功劳，一部分是ZGC现在还不支持分代收集，天然就没有跨代引用的问题）。内存屏障对程序 运行时性能的损耗在前面章节中已经讲解过，能够省去一部分的内存屏障，显然对程序运行效率是大 有裨益的，所以ZGC对吞吐量的影响也相对较低。</p>
-</li>
-<li><p>染色指针可以作为一种可扩展的存储结构用来记录更多与对象标记、重定位过程相关的数据，以便日后进一步提高性能。现在Linux下的64位指针还有前18位并未使用，它们虽然不能用来寻址，却可 以通过其他手段用于信息记录。如果开发了这18位，既可以腾出已用的4个标志位，将ZGC可支持的 最大堆内存从4TB拓展到64TB，也可以利用其余位置再存储更多的标志，譬如存储一些追踪信息来让 垃圾收集器在移动对象时能将低频次使用的对象移动到不常访问的内存区域。</p>
-</li>
-</ul>
+<p>模块化系统通过明确声明模块之间的依赖关系，避免了这些问题。每个模块都有自己的命名空间，类加载器会根据模块声明的依赖关系来加载类，从而减少了类路径配置的复杂性和错误。</p>
 <ol>
-<li>并发标记（Concurrent Mark）：与G1、Shenandoah一样，并发标记是遍历对象图做可达性分析的 阶段，前后也要经过类似于G1、Shenandoah的初始标记、最终标记（尽管ZGC中的名字不叫这些）的 短暂停顿，而且这些停顿阶段所做的事情在目标上也是相类似的。与G1、Shenandoah不同的是，ZGC 的标记是在指针上而不是在对象上进行的，标记阶段会更新染色指针中的M arked 0、M arked 1标志 位。</li>
-<li>并发预备重分配（Concurrent Prep are for Relocate）：这个阶段需要根据特定的查询条件统计得出 本次收集过程要清理哪些Region，将这些Region组成重分配集（Relocation Set）。重分配集与G1收集器 的回收集（Collection Set）还是有区别的，ZGC划分Region的目的并非为了像G1那样做收益优先的增量回收。相反，ZGC每次回收都会扫描所有的Region，用范围更大的扫描成本换取省去G1中记忆集的 维护成本。因此，ZGC的重分配集只是决定了里面的存活对象会被重新复制到其他的Region中，里面 的Region会被释放，而并不能说回收行为就只是针对这个集合里面的Region进行，因为标记过程是针对 全堆的。此外，在JDK 12的ZGC中开始支持的类卸载以及弱引用的处理，也是在这个阶段中完成的。</li>
-<li>并发重分配（Concurrent Relocate）：重分配是ZGC执行过程中的核心阶段，这个过程要把重分 配集中的存活对象复制到新的Region上，并为重分配集中的每个Region维护一个转发表（Forward Table），记录从旧对象到新对象的转向关系。得益于染色指针的支持，ZGC收集器能仅从引用上就明 确得知一个对象是否处于重分配集之中，如果用户线程此时并发访问了位于重分配集中的对象，这次 访问将会被预置的内存屏障所截获，然后立即根据Region上的转发表记录将访问转发到新复制的对象 上，并同时修正更新该引用的值，使其直接指向新对象，ZGC将这种行为称为指针的“自愈”（Self- Healing）能力。这样做的好处是只有第一次访问旧对象会陷入转发，也就是只慢一次，对比 Shenandoah的Brooks转发指针，那是每次对象访问都必须付出的固定开销，简单地说就是每次都慢， 因此ZGC对用户程序的运行时负载要比Shenandoah来得更低一些。还有另外一个直接的好处是由于染 色指针的存在，一旦重分配集中某个Region的存活对象都复制完毕后，这个Region就可以立即释放用于 新对象的分配（但是转发表还得留着不能释放掉），哪怕堆中还有很多指向这个对象的未更新指针也 没有关系，这些旧指针一旦被使用，它们都是可以自愈的。</li>
-<li>并发重映射（Concurrent Remap ）：重映射所做的就是修正整个堆中指向重分配集中旧对象的所 有引用，这一点从目标角度看是与Shenandoah并发引用更新阶段一样的，但是ZGC的并发重映射并不 是一个必须要“迫切”去完成的任务，因为前面说过，即使是旧引用，它也是可以自愈的，最多只是第 一次使用时多一次转发和修正操作。重映射清理这些旧引用的主要目的是为了不变慢（还有清理结束 后可以释放转发表这样的附带收益），所以说这并不是很“迫切”。因此，ZGC很巧妙地把并发重映射 阶段要做的工作，合并到了下一次垃圾收集循环中的并发标记阶段里去完成，反正它们都是要遍历所 有对象的，这样合并就节省了一次遍历对象图[9]的开销。一旦所有指针都被修正之后，原来记录新旧 对象关系的转发表就可以释放掉了。</li>
+<li>更好的封装</li>
 </ol>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:39.583Z" title="2025/5/16 11:12:39">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">3 分钟读完 (大约393个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95/">可达性分析算法</a></p><div class="content"><br/>
-
-<p>通过一系列称为“GC Roots”的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过 程所走过的路径称为“引用链”（Reference Chain），如果某个对象到GC Roots间没有任何引用链相连， 或者用图论的话来说就是从GC Roots到这个对象不可达时，则证明此对象是不可能再被使用的。<br><br/></p>
-<p><img src="/media/17304386866747/17304388367110.jpg"></p>
-<br/>
-
-<h3 id="在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种："><a href="#在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种：" class="headerlink" title="在Java技术体系里面，固定可作为GC Roots的对象包括以下几种："></a>在Java技术体系里面，固定可作为GC Roots的对象包括以下几种：</h3><br/>
-
+<p>在传统的 Java 应用程序中，所有的公共类（public 类）都对其他类可见，这导致了封装的不足。模块化系统通过 module-info.java 文件提供了更强的封装机制：</p>
+<pre><code>* 默认封装：模块内部的包默认对其他模块不可见，除非显式导出。
+* 导出包：模块可以通过 exports 关键字导出特定的包，使其对其他模块可见。
+* 开放包：模块可以通过 opens 关键字开放特定的包，允许其他模块通过反射访问这些包中的类。
+</code></pre>
+<p>这种封装机制提高了代码的安全性和可维护性，减少了不必要的依赖和潜在的副作用。</p>
+<ol start="2">
+<li>依赖管理</li>
+</ol>
+<p>模块化系统允许明确声明模块之间的依赖关系，通过 requires 关键字指定模块依赖的其他模块。这使得依赖管理更加清晰和可控：</p>
+<pre><code>* 显式依赖：模块必须显式声明其依赖的其他模块，避免了隐式依赖带来的问题。
+* 版本管理：模块化系统支持版本管理，可以指定依赖的具体版本，减少版本冲突。
+</code></pre>
+<ol start="3">
+<li>性能优化</li>
+</ol>
+<p>模块化系统通过以下方式优化了性能：</p>
+<pre><code>* 按需加载：JVM 只加载应用程序实际使用的模块，减少了类加载的时间和内存占用。
+* 模块缓存：JVM 可以缓存已加载的模块，加快后续启动时间。
+* 类加载优化：模块化系统提供了更高效的类加载机制，减少了类加载的开销。
+</code></pre>
+<ol start="4">
+<li>可维护性和可扩展性</li>
+</ol>
+<p>模块化系统使得大型应用程序的维护和扩展更加容易：<br>    * 独立开发：每个模块可以独立开发和测试，减少了模块间的耦合。<br>    * 模块替换：可以轻松地替换或升级单个模块，而不需要重新构建整个应用程序。<br>    * 模块隔离：模块之间的隔离机制减少了模块间的干扰，提高了系统的稳定性和可靠性。</p>
+<ol start="5">
+<li>标准化的平台模块</li>
+</ol>
+<p>Java 9 将 JDK 本身也模块化，将其拆分为多个标准模块，如 java.base、java.logging、java.sql 等。这使得开发者可以根据需要选择加载特定的模块，减少了 JDK 的体积和启动时间。</p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ul>
+<li>模块路径：确保模块路径正确设置，否则 JVM 无法找到模块。</li>
+<li>导出和开放：模块内部的包默认对其他模块不可见，需要显式导出或开放。</li>
+<li>反射访问：模块化系统限制了反射访问，需要使用 –add-opens 或 –add-exports 参数来开放访问。</li>
+</ul>
+<h2 id="类加载器的变动"><a href="#类加载器的变动" class="headerlink" title="类加载器的变动"></a>类加载器的变动</h2><p>为了保证兼容性，JDK 9并没有从根本上动摇从JDK 1.2以来运行了二十年之久的三层类加载器架 构以及双亲委派模型。但是为了模块化系统的顺利施行，模块化下的类加载器仍然发生了一些应该被注意到变动，主要包括以下几个方面。</p>
 <ol>
-<li>在虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的 参数、局部变量、临时变量等。</li>
-<li>在<strong>方法区中类静态属性</strong>引用的对象，譬如Java类的引用类型静态变量。</li>
-<li>在<strong>方法区中常量</strong>引用的对象，譬如字符串常量池（String Table）里的引用。</li>
-<li>在本地方法栈中JNI（即通常所说的Native方法）引用的对象。</li>
-<li>Java虚拟机内部的引用，如基本数据类型对应的Class对象，一些常驻的异常对象（比如 NullPointExcepiton、OutOfMemoryError）等，还有系统类加载器。</li>
-<li>所有被同步锁（synchronized关键字）持有的对象。</li>
-<li>反映Java虚拟机内部情况的JM XBean、JVM TI中注册的回调、本地代码缓存等。</li>
+<li><p>扩展类加载器（Extension Class Loader）被平台类加载器（Platform Class Loader）取代。</p>
+<p> 既然整个JDK都基于模块化进行构建（原来的rt.jar和tools.jar被拆分成数十个JMOD文件），其中的Java类库就已天然地满足了可扩展的需求，那自然无须再保留</p>
+</li>
 </ol>
-<br/>
-
-
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:43.660Z" title="2025/5/16 11:12:43">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">5 分钟读完 (大约788个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-%E5%9F%BA%E6%9C%AC%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/">基本垃圾回收算法</a></p><div class="content"><p>[TOC]</p>
-<br/>
-
-<blockquote>
-<p>在对基本回收策略进行描述时，我们假设赋值器运行在一个或者多个线程之上，<br>且只有一个回收器线程，当回收器线程运行时，所有的赋值器线程均处于停止状态。这种<br><strong>万物静止(stop the world)</strong> 的策略大幅简化了回收器的实现。从赋值器线程角度来看，回收过程的执行是原子性的，即赋值器线程感知不到回收器的任何中间状态，回收器也不会受到赋值器线程的任何干扰。</p>
-</blockquote>
-<br/>
-
-<h2 id="标记－清除（mark-sweep"><a href="#标记－清除（mark-sweep" class="headerlink" title="标记－清除（mark-sweep)"></a>标记－清除（mark-sweep)</h2><br/>
-
-<p>回收过程分为两个阶段</p>
+<p><JAVA_HOM E>\lib\ext目录，此前使用这个目录或者java.ext.dirs系统变量来扩展JDK功能的机制已经没有继续存在的价值了，用来加载这部分类库的扩展类加载器也完成了它的历史使命。</p>
+<ol start="2">
+<li><p>平台类加载器和应用程序类加载器都不再派生自java.net.URLClassLoader</p>
+<p> 现在启动类加载器、平台类加载器、应用程序类加载器全都继承于</p>
+</li>
+</ol>
+<p>jdk.internal.loader.BuiltinClassLoader，在BuiltinClassLoader中实现了新的模块化架构下类如何从模块中加载的逻辑，以及模块中资源可访问性的处理。</p>
+<ol start="3">
+<li>启动类加载器现在是在Java虚拟机 内部和Java类库共同协作实现的类加载器，尽管有了BootClassLoader这样的Java类，但为了与之前的代码保持兼容，所有在获取启动类加载器的场景（譬如Object.class.getClassLoader()）中仍然会返回null来代替，而不会得到BootClassLoader的实例。</li>
+</ol>
+<p><img src="/media/17327806185618/17327814763235.jpg"></p>
+<p>JDK9中虽然仍然维持着三层类加载器和双亲委派的架构，但类加载的委派关系也发生了变动。<strong>当平台及应用程序类加载器收到类加载请求，在委派给父加载器加载前，要先判断该类是否能够归属到某一个系统模块中，如果可以找到这样的归属关系，就要优先委派给负责那个模块的加载器完成加载</strong>。</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:37.713Z" title="2025/5/16 11:13:37">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">4 分钟读完 (大约629个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD/Tomcat%EF%BC%9A%E6%AD%A3%E7%BB%9F%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E6%9E%B6%E6%9E%84/">Tomcat：正统的类加载器架构</a></p><div class="content"><p>[TOC]</p>
+<p>一个功能健全的Web服务器，都要解决 如下的这些问题：</p>
 <ul>
-<li>第一阶段为追踪(trace) 阶段，即回收器从根集合（寄存器、线程栈、全局变址）开始遍历对象图，并标记(mark) 所遇到的每个对象；</li>
-<li>第二阶段为清扫 (sweep)阶段，即回收器检查堆中每一个对象，<br>并将所有<strong>未标记的对象</strong>当作垃圾进行回收。</li>
+<li>部署在同一个服务器上的两个Web应用程序所使用的Java类库可以实现相互隔离。这是最基本的需求，两个不同的应用程序可能会依赖同一个第三方类库的不同版本，不能要求每个类库在一个服务器中只能有一份，服务器应当能够保证两个独立应用程序的类库可以互相独立使用。</li>
+<li>部署在同一个服务器上的两个Web应用程序所使用的Java类库可以互相共享。这个需求与前面一点正好相反，但是也很常见，例如用户可能有10个使用Spring组织的应用程序部署在同一台服务器上，如果把10份Spring分别存放在各个应用程序的隔离目录中，将会是很大的资源浪费——这主要倒不是浪费磁盘空间的问题，而是指类库在使用时都要被加载到服务器内存，如果类库不能共享，虚拟机的方法区就会很容易出现过度膨胀的风险</li>
 </ul>
-<p><img src="/media/17304402487913/17306989696842.jpg"></p>
-<p>主要缺点有两个：</p>
+<p>在Tomcat目录结构中，可以设置3组目录（&#x2F;common&#x2F;*、&#x2F;server&#x2F;*和&#x2F;shared&#x2F;*，但默认不一定是开放的，可能只有&#x2F;lib&#x2F;*目录存在）用于存放Java类库，另外还应该加上Web应用程序自身的“&#x2F;WEB- INF&#x2F;*”目录，一共4组。把Java类库放置在这4组目录中，每一组都有独立的含义，分别是：</p>
 <ul>
-<li>第一个是<strong>执行效率不稳定</strong>，如果Java堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；</li>
-<li>第二个是<strong>内存空间的碎片化问题</strong>，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
+<li>放置在&#x2F;common目录中。类库可被Tomcat和所有的Web应用程序共同使用。</li>
+<li>放置在&#x2F;server目录中。类库可被Tomcat使用，对所有的Web应用程序都不可见。</li>
+<li>放置在&#x2F;shared目录中。类库可被所有的Web应用程序共同使用，但对Tomcat自己不可见。</li>
+<li>放置在&#x2F;WebApp&#x2F;WEB-INF目录中。类库仅仅可以被该Web应用程序使用，对Tomcat和其他Web应用程序都不可见.</li>
 </ul>
-<br/>
+<p>为了支持这套目录结构，并对目录里面的类库进行加载和隔离，Tomcat自定义了多个类加载器， 这些类加载器按照经典的双亲委派模型来实现。</p>
+<p><img src="/media/17331263933834/17331269440770.jpg"></p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:34.793Z" title="2025/5/16 11:13:34">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">11 分钟读完 (大约1682个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/">类加载器</a></p><div class="content"><p>[TOC]</p>
+<p>对于任意一个类，都必须由加载它的类加载器和这个类本身一起共同确立其在Java虚拟机中的唯一性，每一个类加载器，都拥有一个独立的类名称空间。这句话可以表达得更通俗一些：比较两个类是否“相等”，只有在这两个类是由同一个类加载器加载的前提下才有意义，否则，即使这两个类来源于同一个 Class文件，被同一个Java虚拟机加载，只要加载它们的类加载器不同，那这两个类就必定不相等。这里所指的“相等”，包括代表类的Class对象的equals()方法、isAssignableFrom()方法、isInstance() 方法的返回结果，也包括了使用instanceof关键字做对象所属关系判定等各种情况。</p>
+<h1 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h1><p>站在Java虚拟机的角度来看，只存在两种不同的类加载器：</p>
+<ul>
+<li>一种是启动类加载器（Bootstrap ClassLoader），这个类加载器使用C++语言实现，是虚拟机自身的一部分；</li>
+<li>一种是其他所有的类加载器，这些类加载器都由Java语言实现，独立存在于虚拟机外部，并且全都继承自抽象类 java.lang.ClassLoader。</li>
+</ul>
+<p>站在Java开发人员的角度来看，类加载器就应当划分得更细致一些。Java一直保持着三层类加载器、双亲委派的类加载架构，尽管这套架构在Java模块化系统出现后有了一些调整变动，但依然未改变其主体结构。</p>
+<ul>
+<li><p>启动类加载器（Bootstrap ClassLoader）：这个类加载器负责加载存放在 <JAVA_HOME>\lib目录，或者被-Xbootclasspath参数所指定的路径中存放的，而且是Java虚拟机能够识别的（按照文件名识别，如rt.jar、tools.jar，名字不符合的类库即使放在lib目录中也不会被加载）类库加载到虚拟机的内存中。启动类加载器无法被Java程序直接引用，用户在编写自定义类加载器时， 如果需要把加载请求委派给引导类加载器去处理，那直接使用null代替即可。</p>
+</li>
+<li><p>·扩展类加载器（Extension ClassLoader）：这个类加载器是在类sun.misc.Launcher$ExtClassLoader 中以Java代码的形式实现的。它负责加载<JAVA_HOME>\lib\ext目录中，或者被java.ext.dirs系统变量所指定的路径中所有的类库。根据“扩展类加载器”这个名称，就可以推断出这是一种Java系统类库的扩 展机制，JDK的开发团队允许用户将具有通用性的类库放置在ext目录里以扩展Java SE的功能，在JDK9之后，这种扩展机制被模块化带来的天然的扩展能力所取代。由于扩展类加载器是由Java代码实现的，开发者可以直接在程序中使用扩展类加载器来加载Class文件。</p>
+</li>
+<li><p>应用程序类加载器（Application ClassLoader）：这个类加载器由sun.misc.Launcher$AppClassLoader来实现。由于应用程序类加载器ClassLoader类中的getSystem-ClassLoader()方法的返回值，所以有些场合中也称它为“系统类加载器”。它负责加载用户类路径（ClassPath）上所有的类库，开发者同样可以直接在代码中使用这个类加载器。如果应用程序中没有 自定义过自己的类加载器，一般情况下这个就是程序中默认的类加载器。</p>
+</li>
+</ul>
+<p><img src="/media/17327757572361/17327774582692.jpg"></p>
+<p>双亲委派模型要求除了顶层的启动类加载器外，其余的类加载器都应有自己的父类加载 器。不过这里类加载器之间的父子关系一般不是以继承（Inheritance）的关系来实现的，而是通常使用组合（Composition）关系来复用父加载器的代码。</p>
+<p>双亲委派模型的工作过程是：<strong>如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此，因此所有的加载请求最终都应该传送到最顶层的启动类加载器中，只有当父加载器反馈自己无法完成这个加载请求（它的搜索范围中没有找到所需的类）时，子加载器才会尝试自己去完成加载</strong>。</p>
+<p>使用双亲委派模型来组织类加载器之间的关系，一个显而易见的好处就是Java中的类随着它的类加载器一起具备了一种带有优先级的层次关系。例如类java.lang.Object，它存放在rt.jar之中，无论哪一个类加载器要加载这个类，最终都是委派给处于模型最顶端的启动类加载器进行加载，因此Object类在程序的各种类加载器环境中都能够保证是同一个类。反之，如果没有使用双亲委派模型，都由各个类加载器自行去加载的话，如果用户自己也编写了一个名为java.lang.Object的类，并放在程序的ClassPath中，那系统中就会出现多个不同的Object类，Java类型体系中最基础的行为也就无从保证，应 用程序将会变得一片混乱。如果读者有兴趣的话，可以尝试去写一个与rt.jar类库中已有类重名的Java 类，将会发现它可以正常编译，但永远无法被加载运行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">protected synchronized Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException &#123;</span><br><span class="line">        // 首先，检查请求的类是否已经被加载过了 Class c = findLoadedClass(name);</span><br><span class="line">        if (c == null) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                if (parent != null) &#123;</span><br><span class="line">                    c = parent.loadClass(name, false);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    c =findBootstrapClassOrNull(name);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (ClassNotFoundException e)&#123;</span><br><span class="line">                // 如果父类加载器抛出ClassNotFoundException</span><br><span class="line">                //说明父类加载器无法完成加载请求</span><br><span class="line">            &#125;</span><br><span class="line">            if(c ==null) &#123;</span><br><span class="line">                //在父类加载器无法加载时</span><br><span class="line">                //再调用本身的findClass方法来进行类加载</span><br><span class="line">                c =findClass(name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (resolve) &#123;</span><br><span class="line">            resolveClass(c);</span><br><span class="line">        &#125;</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="标记－复制-mark-copy"><a href="#标记－复制-mark-copy" class="headerlink" title="标记－复制 (mark-copy)"></a>标记－复制 (mark-copy)</h2><br/>
 
-<p>它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
-<p>每次都是针对整个半区进行内存回收，分配内存时也就不用考虑有 间碎片的复杂情况，只要移动堆顶指针，按顺序分配即可。这样实现简单，运行高效。</p>
-<p>这种复制回收算法的代价是将可用内存缩小为了原来的一半，空间浪费太多。标<br><img src="/media/17304402487913/17307003523033.jpg"></p>
-<br/>
-
-<h2 id="标记－整理-mark-compact"><a href="#标记－整理-mark-compact" class="headerlink" title="标记－整理 (mark-compact)"></a>标记－整理 (mark-compact)</h2><br/>
-
-<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法，而后者是移动式的。其中的标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</p>
-<p><img src="/media/17304402487913/17307017755862.jpg"></p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:14:00.678Z" title="2025/5/16 11:14:00">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">7 分钟读完 (大约1117个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/Java%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6/">Java线程调度</a></p><div class="content"><p>[TOC]</p>
 <p>线程调度是指系统为线程分配处理器使用权的过程，调度主要方式有两种，分别是协同式 （Coop erative Threads-Scheduling）线程调度和抢占式（Preemptive Threads-Scheduling）线程调度。</p>
 <ul>
@@ -161,9 +157,86 @@
 <h1 id="线程优先级"><a href="#线程优先级" class="headerlink" title="线程优先级"></a>线程优先级</h1><p>java 语言一共设置了10个级别的线程优先级（Thread.MIN_PRIORITY至Thread.M AX_PRIORITY）。在两个线程同时处于Ready状态时，优先级越高的线程越容易被系统选择执行。</p>
 <p>不过，线程优先级并不是一项稳定的调节手段，很显然因为主流虚拟机上的Java线程是被映射到系统的原生线程上来实现的，所以线程调度最终还是由操作系统说了算。尽管现代的操作系统基本都提供线程优先级的概念，但是并不见得能与Java线程的优先级一一对应，如Solaris中线程有 2147483648（2的31次幂）种优先级，但Windows中就只有七种优先级。如果操作系统的优先级比Java线程优先级更多，那问题还比较好处理，中间留出一点空位就是了，但对于比Java线程优先级少的 统，就不得不出现几个线程优先级对应到同一个操作系统优先级的情况了。<br><img src="/media/17332806367641/17332808870140.jpg"></p>
 <p>线程优先级并不是一项稳定的调节手段，这不仅仅体现在某些操作系统上不同的优先级实际会变得相同这一点上，还有其他情况让我们不能过于依赖线程优先级：优先级可能会被系统自行改变，例如在Windows系统中存在一个叫“优先级推进器”的功能（Priority Boosting，当然它可以被关掉），大致作用是当系统发现一个线程被执行得特别频繁时，可能会越过线程优先级去为它分配执行时间，从 而减少因为线程频繁切换而带来的性能损耗。因此，我们并不能在程序中通过优先级来完全准确判断 一组状态都为Ready 的线程将会先执行哪一个。</p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:54.135Z" title="2025/5/16 11:13:54">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">2 分钟读完 (大约346个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E4%B8%BB%E5%86%85%E5%AD%98%E4%B8%8E%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98/">主内存与工作内存</a></p><div class="content"><p>Java内存模型规定了所有的变量都存储在主内存（Main Memory ）中，每条线程还有自己的工作内存（Working Memory ），线程的工作内存中保存了被该线程使用的变量的主内存副本，线程对变量的所有操作（读取、赋值等）都必须在工作内存中进行，而不能直接读写主内存中的数据。不同的线程之间也无法直接访问对方工作内存中的变量，线程间变量值的传递均需要通过主内存来完成，线程、主内存、工作内存三者的交互关系如图：</p>
-<p><img src="/media/17332080440323/17332080696248.jpg"></p>
-<p>从变量、主内存、工作内存的定义来看，主内存主要对应于Java堆中的对象实例数据部分，而工作内存则对应于虚拟机栈中的部分区域。从更基础的层次上说，主内存直接对应于物理硬件的内存，而为了获取更好的运行速度，虚拟机（或者是硬件、操作系统本身的优化措施）可能会让工作内存优先存储于寄存器和高速缓存中，因为程序运行时主要访问的是工作内存。</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:31.848Z" title="2025/5/16 11:13:31">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">20 分钟读完 (大约3015个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">类加载机制</a></p><div class="content"><p>[TOC]</p>
+<p>以个类型从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期将会经历加载 （Loading）、验证（Verification）、准备（Prep aration）、解析（Resolution）、初始化 （Initialization）、使用（Using）和卸载（Unloading）七个阶段，其中验证、准备、解析三个部分统称为连接（Linking）</p>
+<p><img src="/media/17326025297735/17326857385876.jpg"></p>
+<p>《Java虚拟机规范》 则是严格规定了有且只有六种情况必须立即对类进行“初始化”（而加载、验证、准备自然需要在此之前开始）：</p>
+<ol>
+<li><p>遇到new、getstatic、putstatic或invokestatic这四条字节码指令时，如果类型没有进行过初始 化，则需要先触发其初始化阶段。能够生成这四条指令的典型Java代码场景有：</p>
+<ul>
+<li>使用new关键字实例化对象的时候。</li>
+<li>读取或设置一个类型的静态字段（被final修饰、已在编译期把结果放入常量池的静态字段除外） 的时候。</li>
+<li>调用一个类型的静态方法的时候。</li>
+</ul>
+</li>
+<li><p>使用java.lang.reflect包的方法对类型进行反射调用的时候，如果类型没有进行过初始化，则需 要先触发其初始化。</p>
+</li>
+<li><p>当初始化类的时候，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</p>
+</li>
+<li><p>当虚拟机启动时，用户需要指定一个要执行的主类（包含main()方法的那个类），虚拟机会先初始化这个主类。</p>
+</li>
+<li><p>当使用JDK 7新加入的动态语言支持时，如果一个java.lang.invoke.M ethodHandle实例最后的解 析结果为REF_getStatic、REF_p utStatic、REF_invokeStatic、REF_newInvokeSp ecial四种类型的方法句 柄，并且这个方法句柄对应的类没有进行过初始化，则需要先触发其初始化。</p>
+</li>
+<li><p>当一个接口中定义了JDK 8新加入的默认方法（被default关键字修饰的接口方法）时，如果有 这个接口的实现类发生了初始化，那该接口要在其之前被初始化。</p>
+</li>
+</ol>
+<h2 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h2><p>“加载”（Loading）阶段是整个“类加载”（Class Loading）过程中的一个阶段，在加载阶段，Java虚拟机需要完成以下三件事情：</p>
+<ol>
+<li>通过一个类的全限定名来获取定义此类的二进制字节流</li>
+<li>将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构。</li>
+<li>在内存中生成一个代表这个类的java.lang.Class对象，作为方法区这个类的各种数据的访问入 口。</li>
+</ol>
+<p><strong>一个数组类（下面简称 为C）创建过程遵循以下规则：</strong></p>
+<ul>
+<li>如果数组的组件类型是引用类型，那就递归采用加载过程去加载这个组件类型，数组C将被标识在加载该组件类型的类加载器的类名称空间上；</li>
+<li>如果数组的组件类型不是引用类型（例如int[]数组的组件类型为int），Java虚拟机将会把数组C标记为与引导类加载器关联。</li>
+<li>数组类的可访问性与它的组件类型的可访问性一致，如果组件类型不是引用类型，它的数组类的可访问性将默认为public，可被所有的类和接口访问到。</li>
+</ul>
+<p>加载阶段与连接阶段的部分动作（如一部分字节码文件格式验证动作）是交叉进行的，加载阶段尚未成，连接阶段可能已经开始，但这些夹在加载阶段之中进行的动作，仍然属于连接阶段的一部分，这两个阶段的开始时间仍然保持着固定的先后顺序</p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>这一阶段的目的是确保Class文件的字节流中包含的信息符合《Java虚拟机规范》的全部约束要求，保证这些信息被当作代码运行后不会危害虚拟机自身的安全。</p>
+<p>验证阶段大致上会完成下面四个阶段的检验动作：文件格式验证、元数据验证、字节码验证和符号引用验证。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>准备阶段是正式为类中定义的变量（即静态变量，被static修饰的变量）分配内存并设置类变量初始值的阶段。</p>
+<p>进行内存分配的仅包括类变量，而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在Java堆中。<strong>这里所说的初始值“通常情况”下是数据类型的零值</strong>，假设一个类变量的定义为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static int value = 123;</span><br></pre></td></tr></table></figure>
+
+<p>那变量value在准备阶段过后的初始值为0而不是123，因为这时尚未开始执行任何Java方法，而把 value赋值为123的putstatic指令是程序被编译后，存放于类构造器<clinit>()方法之中，所以把value赋值为123的动作要到类的初始化阶段才会被执行。</p>
+<p>如果类字段 的字段属性表中存在ConstantValue属性，那在准备阶段变量值就会被初始化为ConstantValue属性所指定 的初始值，假设上面类变量value的定义修改为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static final int value = 123;</span><br></pre></td></tr></table></figure>
+
+<p>编译时Javac将会为value生成ConstantValue属性，在准备阶段虚拟机就会根据Con-stantValue的设置 将value赋值为123。</p>
+<h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>解析阶段是Java虚拟机将常量池内的符号引用替换为直接引用的过程。</p>
+<ul>
+<li><p>符号引用（Sy mbolic References）：符号引用以一组符号来描述所引用的目标，符号可以是任何 形式的字面量，只要使用时能无歧义地定位到目标即可。符号引用与虚拟机实现的内存布局无关，引用的目标并不一定是已经加载到虚拟机内存当中的内容。各种虚拟机实现的内存布局可以各不相同， 但是它们能接受的符号引用必须都是一致的，因为符号引用的字面量形式明确定义在《Java虚拟机规范》的Class文件格式中。</p>
+</li>
+<li><p>直接引用（Direct References）：直接引用是可以直接指向目标的指针、相对偏移量或者是一个能 间接定位到目标的句柄。直接引用是和虚拟机实现的内存布局直接相关的，同一个符号引用在不同虚 拟机实例上翻译出来的直接引用一般不会相同。如果有了直接引用，那引用的目标必定已经在虚拟机 的内存中存在。</p>
+</li>
+</ul>
+<p>类加载过程中的解析阶段是Java虚拟机将常量池内的符号引用转换为直接引用的过程。以下是解析阶段的主要步骤</p>
+<ul>
+<li>符号引用验证：首先，虚拟机会检查符号引用是否能定位到方法区中的类或接口。如果找不到，则抛出NoClassDefFoundError错误。</li>
+<li>解析类和接口：对于每个符号引用，虚拟机会尝试加载对应的类或接口。如果类或接口尚未加载，则会触发其加载、链接（包括准备、验证、解析）过程。</li>
+<li>解析字段：解析类或接口中的字段，确定字段在运行时常量池中的位置。如果字段不存在，则抛出NoSuchFieldError错误。</li>
+<li>解析类方法：解析类的方法，确定方法在运行时常量池中的位置。如果方法不存在，则抛出NoSuchMethodError错误。</li>
+<li>解析接口方法：解析接口的方法，确定方法在运行时常量池中的位置。如果方法不存在，则抛出NoSuchMethodError错误。</li>
+<li>转换为直接引用：一旦符号引用被成功解析，虚拟机会将其转换为直接引用，即指向方法区中数据的具体位置。</li>
+<li>解析阶段确保了程序中使用的类、接口、字段和方法在运行时能够正确访问。这是类加载机制中非常关键的一环，保证了Java程序的动态性和安全性。</li>
+</ul>
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p>类的初始化阶段是类加载过程的最后一个步骤，之前介绍的几个类加载的动作里，除了在加载阶段用户应用程序可以通过自定义类加载器的方式局部参与外，其余动作都完全由Java虚拟机来主导控制。直到初始化阶段，Java虚拟机才真正开始执行类中编写的Java程序代码，将主导权移交给应用程序。</p>
+<p>初始化阶段就是执行类构造器clinit()方法的过程， </p>
+<ul>
+<li><p>clinit()方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块（static{}块）中的语句合并产生的，编译器收集的顺序是由语句在源文件中出现的顺序决定的，静态语句块中只能访问到定义在静态语句块之前的变量，定义在它之后的变量，在前面的静态语句块可以赋值，但是不能访问。</p>
+</li>
+<li><p>clinit()方法与类的构造函数（即在虚拟机视角中的实例构造器init()方法）不同，它不需要显式地调用父类构造器，Java虚拟机会保证在子类的clinit()方法执行前，父类的clinit()方法已经执行完毕。因此在Java虚拟机中第一个被执行的clinit()方法的类型肯定是java.lang.Object。</p>
+</li>
+<li><p>由于父类的clinit()方法先执行，也就意味着父类中定义的静态语句块要优先于子类的变量赋值操作</p>
+</li>
+<li><p>clinit()方法对于类或接口来说并不是必需的，如果一个类中没有静态语句块，也没有对变量的 赋值操作，那么编译器可以不为这个类生成clinit()方法。</p>
+</li>
+<li><p>接口中不能使用静态语句块，但仍然有变量初始化的赋值操作，因此接口与类一样都会生成 clinit()方法。但接口与类不同的是，执行接口的clinit()方法不需要先执行父接口的clinit()方法， 因为只有当父接口中定义的变量被使用时，父接口才会被初始化。此外，接口的实现类在初始化时也一样不会执行接口的clinit()方法。</p>
+</li>
+<li><p>Java虚拟机必须保证一个类的clini&gt;()方法在多线程环境中被正确地加锁同步，如果多个线程同时去初始化一个类，那么只会有其中一个线程去执行这个类的clinit()方法，其他线程都需要阻塞等待，直到活动线程执行完毕clinit&gt;)方法。如果在一个类的clinit()方法中有耗时很长的操作，那就可能造成多个进程阻塞。</p>
+</li>
+</ul>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:14:04.502Z" title="2025/5/16 11:14:04">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约945个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/volatile%E5%9E%8B%E5%8F%98%E9%87%8F/">volatile型变量</a></p><div class="content"><p>当一个变量被定义成volatile之后，它将具备两项特性：</p>
 <ol>
 <li>保证此变量对所有线程的可见性，这里的“可见性”是指当一条线程修改了这个变量的值，新值对于其他线程来说是可以立即得知的。而普通变量并不能做到这一点，普通变量的值在线程间传递时均需要通过主内存来完成。比如， 线程A修改一个普通变量的值，然后向主内存进行回写，另外一条线程B在线程A回写完成了之后再对主内存进行读取操作，新变量值才会对线程B可见。</li>
@@ -181,6 +254,9 @@
 <p>  这条规则要求volatile修饰的变量不会被指令重排序优化，从而保证代码的执行顺序与程序的顺序 相同。</p>
 </li>
 </ul>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:54.135Z" title="2025/5/16 11:13:54">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">2 分钟读完 (大约346个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E4%B8%BB%E5%86%85%E5%AD%98%E4%B8%8E%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98/">主内存与工作内存</a></p><div class="content"><p>Java内存模型规定了所有的变量都存储在主内存（Main Memory ）中，每条线程还有自己的工作内存（Working Memory ），线程的工作内存中保存了被该线程使用的变量的主内存副本，线程对变量的所有操作（读取、赋值等）都必须在工作内存中进行，而不能直接读写主内存中的数据。不同的线程之间也无法直接访问对方工作内存中的变量，线程间变量值的传递均需要通过主内存来完成，线程、主内存、工作内存三者的交互关系如图：</p>
+<p><img src="/media/17332080440323/17332080696248.jpg"></p>
+<p>从变量、主内存、工作内存的定义来看，主内存主要对应于Java堆中的对象实例数据部分，而工作内存则对应于虚拟机栈中的部分区域。从更基础的层次上说，主内存直接对应于物理硬件的内存，而为了获取更好的运行速度，虚拟机（或者是硬件、操作系统本身的优化措施）可能会让工作内存优先存储于寄存器和高速缓存中，因为程序运行时主要访问的是工作内存。</p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:56.832Z" title="2025/5/16 11:13:56">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">8 分钟读完 (大约1176个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E4%B8%BB%E5%86%85%E5%AD%98%E4%B8%8E%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98%E9%97%B4%E4%BA%A4%E4%BA%92%E6%93%8D%E4%BD%9C/">主内存与工作内存间交互操作</a></p><div class="content"><p>关于主内存与工作内存之间具体的交互协议，即一个变量如何从主内存拷贝到工作内存、如何从作内存同步回主内存这一类的实现细节，Java内存模型中定义了以下8种操作来完成。Java虚拟机实现时必须保证下面提及的每一种操作都是原子的、不可再分的.</p>
 <ol>
 <li><p>lock（锁定）：作用于主内存的变量，它把一个变量标识为一条线程独占的状态。</p>
@@ -219,6 +295,14 @@
 <li><p>对一个变量执行unlock操作之前，必须先把此变量同步回主内存中（执行store、write操作）。</p>
 </li>
 </ul>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:51.121Z" title="2025/5/16 11:13:51">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约874个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E5%8E%9F%E5%AD%90%E6%80%A7%E3%80%81%E5%8F%AF%E8%A7%81%E6%80%A7%E4%B8%8E%E6%9C%89%E5%BA%8F%E6%80%A7/">原子性、可见性与有序性</a></p><div class="content"><p>[TOC]</p>
+<h2 id="原子性（Atomicity-）"><a href="#原子性（Atomicity-）" class="headerlink" title="原子性（Atomicity ）"></a>原子性（Atomicity ）</h2><p>由Java内存模型来直接保证的原子性变量操作包括read、load、assign、use、store和write这六个， 我们大致可以认为，基本数据类型的访问、读写都是具备原子性的。<br>如果应用场景需要一个更大范围的原子性保证（经常会遇到），Java内存模型还提供了lock和 unlock操作来满足这种需求，尽管虚拟机未把lock和unlock操作直接开放给用户使用，但是却提供了更高层次的字节码指令monitorenter和monitorexit来隐式地使用这两个操作。这两个字节码指令反映到Java 代码中就是同步块——synchronized关键字，因此在synchronized块之间的操作也具备原子性。</p>
+<h2 id="可见性（Visibility-）"><a href="#可见性（Visibility-）" class="headerlink" title="可见性（Visibility ）"></a>可见性（Visibility ）</h2><p>可见性就是指当一个线程修改了共享变量的值时，其他线程能够立即得知这个修改。Java内存模型是通过在变量修改后将新值同步回主内存，在变量读取前从主内存刷新变量值这种依赖主内存作为传递媒介的方式来实现可见性的，无论是普通变量还是volatile变量都是如此。普通变量与volatile变量的区别是，volatile的特殊规则保证了新 能立即同步到主内存，以及每次使用前立即从主内存刷新。因此我们可以说volatile保证了多线程操作 时变量的可见性，而普通变量则不能保证这一点。</p>
+<p>除了volatile之外，Java还有两个关键字能实现可见性，它们是synchronized和final。</p>
+<p>同步块的可见性是由“对一个变量执行unlock操作之前，必须先把此变量同步回主内存中（执行store、write操作）”这条规则获得的。</p>
+<p>而final关键字的可见性是指：被final修饰的字段在构造器中一旦被初始化完成，并且构造器没有把“this”的引用传递出去（this引用逃逸是一件很危险的事情，其他线程有可能通 过这个引用访问到“初始化了一半”的对象），那么在其他线程中就能看见final字段的值。</p>
+<h2 id="有序性（Ordering）"><a href="#有序性（Ordering）" class="headerlink" title="有序性（Ordering）"></a>有序性（Ordering）</h2><p>Java程序中天然的有序性可总结为一句话：如果在本线程内观察，所有的操作都是有序的；如果在一个线程中观察另一个线程， 所有的操作都是无序的。前半句是指“线程内似表现为串行的语义”（Within-Thread As-If-Serial Semantics），后半句是指“指令重排序”现象和“工作内存与主内存同步延迟”现象。</p>
+<p>Java语言提供了volatile和sychronized两个关键字来保证线程之间操作的有序性，volatile关键字本身就包含了禁止指令重排序的语义，而synchronized则是由“一个变量在同一个时刻只允许一条线程对其进行lock操作”这条规则获得的，这个规则决定了持有同一个锁的两个同步块只能串行地进入。</p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:47.804Z" title="2025/5/16 11:13:47">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">4 分钟读完 (大约531个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2/">线程状态转换</a></p><div class="content"><p>[TOC]</p>
 <p>Java语言定义了6种线程状态，在任意一个时间点中，一个线程只能有且只有其中的一种状态，并 且可以通过特定的方法在不同状态之间转换。这6种状态分别是:</p>
 <ol>
@@ -242,27 +326,7 @@
 <li>结束（Terminated）：已终止线程的线程状态，线程已经结束执行。</li>
 </ol>
 <p><img src="/media/17332809353879/17332816631204.jpg"></p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:44.915Z" title="2025/5/16 11:13:44">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">12 分钟读完 (大约1810个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0/">线程的实现</a></p><div class="content"><p>[Toc]</p>
-<p>实现线程主要有三种方式：使用内核线程实现（1：1实现），使用用户线程实现（1：N实现）， 使用用户线程加轻量级进程混合实现（N：M 实现）</p>
-<h2 id="内核线程实现"><a href="#内核线程实现" class="headerlink" title="内核线程实现"></a>内核线程实现</h2><p>内核线程实现的方式也被称为1：1实现。内核线程（Kernel-Level Thread，KLT）就是直接由操作系统内核（Kernel，下称内核）支持的线程，这种线程由内核来完成线程切换，内核通过操纵调度器（Scheduler）对线程进行调度，并负责将线程的任务映射到各个处理器上。每个内核线程可以视为内核的一个分身，这样操作系统就有能力同时处理多件事情，支持多线程的内核就称为多线程内核（Multi-Threads Kernel）。<br>程序一般不会直接使用内核线程，而是使用内核线程的一种高级接口——轻量级进程（Light Weight Process，LWP），轻量级进程就是我们通常意义上所讲的线程，由于每个轻量级进程都由一个内核线程支持，因此只有先支持内核线程，才能有轻量级进程。这种轻量级进程与内核线程之间1：1 的关系称为一对一的线程模型，</p>
-<p><img src="/media/17332774841086/17332781930808.jpg"></p>
-<p>由于内核线程的支持，每个轻量级进程都成为一个独立的调度单元，即使其中某一个轻量级进程在系统调用中被阻塞了，也不会影响整个进程继续工作。轻量级进程也具有它的局限性：首先，由于是基于内核线程实现的，所以各种线程操作，如创建、析构及同步，都需要进行系统调用。而系统调用的代价相对较高，需要在用户态（User Mode）和内核态（Kernel Mode）中来回切换。其次，每个轻量级进程都需要有一个内核线程的支持，因此轻量级进程要消耗一定的内核资源（如内核线程的栈空间），因此一个系统支持轻量级进程的数量是有限的。</p>
-<h2 id="用户线程实现"><a href="#用户线程实现" class="headerlink" title="用户线程实现"></a>用户线程实现</h2><p>使用用户线程实现的方式被称为1：N实现。广义上来讲，一个线程只要不是内核线程，都可以认为是用户线程（User Thread，UT）的一种，因此从这个定义上看，轻量级进程也属于用户线程，但轻量级进程的实现始终是建立在内核之上的，许多操作都要进行系统调用，因此效率会受到限制，并不具备通常意义上的用户线程的优点。</p>
-<p><img src="/media/17332774841086/17332787230598.jpg"></p>
-<p>而狭义上的用户线程指的是完全建立在用户空间的线程库上，系统内核不能感知到用户线程的存在及如何实现的。用户线程的建立、同步、销毁和调度完全在用户态中完成，不需要内核的帮助。如果程序实现得当，这种线程不需要切换到内核态，因此操作可以是非常快速且低消耗的，也能够支持规模更大的线程数量，部分高性能数据库中的多线程就是由用户线程实现的。这种进程与用户线程之间1：N的关系称为一对多的线程模型</p>
-<p>用户线程的优势在于不需要系统内核支援，劣势也在于没有系统内核的支援，所有的线程操作都需要由用户程序自己去处理。线程的创建、销毁、切换和调度都是用户必须考虑的问题，而且由于操作系统只把处理器资源分配到进程，那诸如“阻塞如何处理”“多处理器系统中如何将线程映射到其他处理器上”这类问题解决起来将会异常困难，甚至有些是不可能实现的。因为使用用户线程实现的程序通常都比较复杂，除了有明确的需求外（譬如以前在不支持多线程的操作系统中的多线程程序、需要支持大规模线程数量的应用），一般的应用程序都不倾向使用用户线程。Java、Ruby 等语言都曾经使用过用户线程，最终又都放弃了使用它。但是近年来许多新的、以高并发为卖点的编程语言又普遍支持了用户线程，譬如Golang、Erlang等，使得用户线程的使用率有所回升。</p>
-<h2 id="混合实现"><a href="#混合实现" class="headerlink" title="混合实现"></a>混合实现</h2><p>线程除了依赖内核线程实现和完全由用户程序自己实现之外，还有一种将内核线程与用户线程一起使用的实现方式，被称为N：M 实现。在这种混合实现下，既存在用户线程，也存在轻量级进程。 用户线程还是完全建立在用户空间中，因此用户线程的创建、切换、析构等操作依然廉价，并且可以 支持大规模的用户线程并发。而操作系统支持的轻量级进程则作为用户线程和内核线程之间的桥梁， 这样可以使用内核提供的线程调度功能及处理器映射，并且用户线程的系统调用要通过轻量级进程来完成，这大大降低了整个进程被完全阻塞的风险。在这种混合模式中，用户线程与轻量级进程的数量 比是不定的，是N：M 的关系。</p>
-<p><img src="/media/17332774841086/17332788627126.jpg"><br>许多UNIX系列的操作系统，如Solaris、HP-UX等都提供了M ：N的线程模型实现。在这些操作系 统上的应用也相对更容易应用M ：N的线程模型。</p>
-<h1 id="Java线程的实现"><a href="#Java线程的实现" class="headerlink" title="Java线程的实现"></a>Java线程的实现</h1><p>以HotSpot为例，它的每一个Java线程都是直接映射到一个操作系统原生线程来实现的，而且中间没有额外的间接结构，所以HotSpot自己是不会去干涉线程调度的（可以设置线程优先级给操作系统提供调度建议），全权交给底下的操作系统去处理，所以何时冻结或唤醒线程、该给线程分配多少处理器执行时间、该把线程安排给哪个处理器核心去执行等，都是由操作系统完成的，也都是由操作系统全权决定的。</p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:13:51.121Z" title="2025/5/16 11:13:51">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约874个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/%E5%8E%9F%E5%AD%90%E6%80%A7%E3%80%81%E5%8F%AF%E8%A7%81%E6%80%A7%E4%B8%8E%E6%9C%89%E5%BA%8F%E6%80%A7/">原子性、可见性与有序性</a></p><div class="content"><p>[TOC]</p>
-<h2 id="原子性（Atomicity-）"><a href="#原子性（Atomicity-）" class="headerlink" title="原子性（Atomicity ）"></a>原子性（Atomicity ）</h2><p>由Java内存模型来直接保证的原子性变量操作包括read、load、assign、use、store和write这六个， 我们大致可以认为，基本数据类型的访问、读写都是具备原子性的。<br>如果应用场景需要一个更大范围的原子性保证（经常会遇到），Java内存模型还提供了lock和 unlock操作来满足这种需求，尽管虚拟机未把lock和unlock操作直接开放给用户使用，但是却提供了更高层次的字节码指令monitorenter和monitorexit来隐式地使用这两个操作。这两个字节码指令反映到Java 代码中就是同步块——synchronized关键字，因此在synchronized块之间的操作也具备原子性。</p>
-<h2 id="可见性（Visibility-）"><a href="#可见性（Visibility-）" class="headerlink" title="可见性（Visibility ）"></a>可见性（Visibility ）</h2><p>可见性就是指当一个线程修改了共享变量的值时，其他线程能够立即得知这个修改。Java内存模型是通过在变量修改后将新值同步回主内存，在变量读取前从主内存刷新变量值这种依赖主内存作为传递媒介的方式来实现可见性的，无论是普通变量还是volatile变量都是如此。普通变量与volatile变量的区别是，volatile的特殊规则保证了新 能立即同步到主内存，以及每次使用前立即从主内存刷新。因此我们可以说volatile保证了多线程操作 时变量的可见性，而普通变量则不能保证这一点。</p>
-<p>除了volatile之外，Java还有两个关键字能实现可见性，它们是synchronized和final。</p>
-<p>同步块的可见性是由“对一个变量执行unlock操作之前，必须先把此变量同步回主内存中（执行store、write操作）”这条规则获得的。</p>
-<p>而final关键字的可见性是指：被final修饰的字段在构造器中一旦被初始化完成，并且构造器没有把“this”的引用传递出去（this引用逃逸是一件很危险的事情，其他线程有可能通 过这个引用访问到“初始化了一半”的对象），那么在其他线程中就能看见final字段的值。</p>
-<h2 id="有序性（Ordering）"><a href="#有序性（Ordering）" class="headerlink" title="有序性（Ordering）"></a>有序性（Ordering）</h2><p>Java程序中天然的有序性可总结为一句话：如果在本线程内观察，所有的操作都是有序的；如果在一个线程中观察另一个线程， 所有的操作都是无序的。前半句是指“线程内似表现为串行的语义”（Within-Thread As-If-Serial Semantics），后半句是指“指令重排序”现象和“工作内存与主内存同步延迟”现象。</p>
-<p>Java语言提供了volatile和sychronized两个关键字来保证线程之间操作的有序性，volatile关键字本身就包含了禁止指令重排序的语义，而synchronized则是由“一个变量在同一个时刻只允许一条线程对其进行lock操作”这条规则获得的，这个规则决定了持有同一个锁的两个同步块只能串行地进入。</p>
-</div></article></div><nav class="pagination" role="navigation" aria-label="pagination"><div class="pagination-previous"><a href="/page/5/">上一页</a></div><div class="pagination-next"><a href="/page/7/">下一页</a></div><ul class="pagination-list is-hidden-mobile"><li><a class="pagination-link" href="/">1</a></li><li><span class="pagination-ellipsis">&hellip;</span></li><li><a class="pagination-link" href="/page/5/">5</a></li><li><a class="pagination-link is-current" href="/page/6/">6</a></li><li><a class="pagination-link" href="/page/7/">7</a></li></ul></nav></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/GeoHash/">GeoHash</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/Scan%E6%8C%87%E4%BB%A4/">Scan指令</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/Stream/">Stream</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/codis%20%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88/">codis 集群方案</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+</div></article></div><nav class="pagination" role="navigation" aria-label="pagination"><div class="pagination-previous"><a href="/page/5/">上一页</a></div><div class="pagination-next"><a href="/page/7/">下一页</a></div><ul class="pagination-list is-hidden-mobile"><li><a class="pagination-link" href="/">1</a></li><li><span class="pagination-ellipsis">&hellip;</span></li><li><a class="pagination-link" href="/page/5/">5</a></li><li><a class="pagination-link is-current" href="/page/6/">6</a></li><li><a class="pagination-link" href="/page/7/">7</a></li></ul></nav></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/PubSub%20%E6%B6%88%E6%81%AF%E5%A4%9A%E6%92%AD%20(%E7%BC%BA%E7%82%B9%E5%A4%9A%E4%B8%8D%E8%A2%AB%E4%BD%BF%E7%94%A8)/">PubSub 消息多播</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/redis%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">redis 分布式锁</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/redis%20list%E5%BA%94%E7%94%A8%E2%80%94%E2%80%94%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">redis list应用——延迟队列</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/codis%20%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88/">codis 集群方案</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
             article: {
                 highlight: {
                     clipboard: true,

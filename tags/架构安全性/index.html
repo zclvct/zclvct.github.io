@@ -29,7 +29,121 @@
       switchTab();
       window.addEventListener('hashchange', switchTab, false);
   })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><div class="card-content"><nav class="breadcrumb" aria-label="breadcrumbs"><ul><li><a href="/tags/">标签</a></li><li class="is-active"><a href="#" aria-current="page">架构安全性</a></li></ul></nav></div></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:34.767Z" title="2025/5/16 11:11:34">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">22 分钟读完 (大约3326个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E5%87%AD%E8%AF%81/">凭证（Credentials）</a></p><div class="content"><blockquote>
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><div class="card-content"><nav class="breadcrumb" aria-label="breadcrumbs"><ul><li><a href="/tags/">标签</a></li><li class="is-active"><a href="#" aria-current="page">架构安全性</a></li></ul></nav></div></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:42.877Z" title="2025/5/16 11:11:42">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">23 分钟读完 (大约3384个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E6%8E%88%E6%9D%83/">授权（ Authorization）</a></p><div class="content"><p>[TOC]</p>
+<blockquote>
+<p>授权（ Authorization）<br>    系统如何控制一个用户该看到哪些数据、能操作哪些功能？</p>
+</blockquote>
+<ul>
+<li><p>确保授权的过程可靠：对于单一系统来说，授权的过程是比较容易做到可控的，以前很多语境上提到授权，实质上讲的都是访问控制，理论上两者是应该分开的。而在涉及多方的系统中，授权过程则是一个比较困难却必须严肃对待的问题：如何既让第三方系统能够访问到所需的资源，又能保证其不泄露用户的敏感数据呢？常用的多方授权协议主要有 OAuth2 和 SAML 2.0（两个协议涵盖的功能并不是直接对等的）。</p>
+</li>
+<li><p>确保授权的结果可控：授权的结果用于对程序功能或者资源的访问控制（Access Control），成理论体系的权限控制模型有很多，譬如自主访问控制（Discretionary Access Control，DAC）、强制访问控制（Mandatory Access Control，MAC）、基于属性的访问控制（Attribute-Based Access Control，ABAC），还有最为常用的基于角色的访问控制（Role-Based Access Control，RBAC）。</p>
+</li>
+</ul>
+<h2 id="RBAC"><a href="#RBAC" class="headerlink" title="RBAC"></a>RBAC</h2><p>所有的访问控制模型，实质上都是在解决同一个问题：“谁（User）拥有什么权限（Authority）去操作（Operation）哪些资源（Resource）”。</p>
+<p><img src="/media/17369093589979/17369101080328.jpg"></p>
+<ul>
+<li>RBAC-1 模型的角色权限继承关系。譬如描述开发经理应该和开发人员一样具有代码提交的权限，描述开发人员都应该和任何公司员工一样具有食堂就餐的权限，就可以直接将食堂就餐赋予公司员工的角色上，把代码提交赋予到开发人员的角色上，再让开发人员的角色从公司员工派生，开发经理的角色从开发人员中派生即可。</li>
+</ul>
+<p><img src="/media/17369093589979/17369103287507.jpg"></p>
+<ul>
+<li>RBAC-2 模型的角色职责分离关系。互斥性要求权限被赋予角色时，或角色被赋予用户时应遵循的强制性职责分离规定。举个例子，角色的互斥约束可限制同一用户只能分配到一组互斥角色集合中至多一个角色，譬如不能让同一名员工既当会计，也当出纳，否则资金安全无法保证。角色的基数约束可限制某一个用户拥有的最大角色数目，譬如不能让同一名员工从产品、设计、开发、测试全部包揽，否则产品质量无法保证。</li>
+</ul>
+<p><img src="/media/17369093589979/17369104337621.jpg"></p>
+<h2 id="OAuth2"><a href="#OAuth2" class="headerlink" title="OAuth2"></a>OAuth2</h2><p> OAuth2 是面向于解决第三方应用（Third-Party Application）的认证授权协议。如果你的系统并不涉及第三方，那引入 OAuth2 其实并无必要。</p>
+<p> OAuth2 给出了多种解决办法，这些办法的共同特征是以令牌（Token）代替用户密码作为授权的凭证。有了令牌之后，哪怕令牌被泄漏，也不会导致密码的泄漏；令牌上可以设定访问资源的范围以及时效性；每个应用都持有独立的令牌，哪个失效都不会波及其他。这样上面提出的三个问题就都解决了。有了一层令牌之后，整个授权的流程如图</p>
+<p> <img src="/media/17369093589979/17369109279655.jpg"></p>
+<ul>
+<li><p>第三方应用（Third-Party Application）：需要得到授权访问我资源的那个应用</p>
+</li>
+<li><p>授权服务器（Authorization Server）：能够根据我的意愿提供授权（授权之前肯定已经进行了必要的认证过程，但它与授权可以没有直接关系）的服务器。</p>
+</li>
+<li><p>资源服务器（Resource Server）：能够提供第三方应用所需资源的服务器，它与认证服务可以是相同的服务器，也可以是不同的服务器</p>
+</li>
+<li><p>资源所有者（Resource Owner）： 拥有授权权限的人，即此场景中的“我”。</p>
+</li>
+<li><p>操作代理（User Agent）：指用户用来访问服务器的工具，对于人类用户来说，这个通常是指浏览器，但在微服务中一个服务经常会作为另一个服务的用户，此时指的可能就是 HttpClient、RPCClient 或者其他访问途径。</p>
+</li>
+</ul>
+<p>用令牌代替密码”确实是解决问题的好方法，但这充其量只能算个思路，距离可实施的步骤还是不够具体的，时序图中的“要求&#x2F;同意授权”、“要求&#x2F;同意发放令牌”、“要求&#x2F;同意开放资源”几个服务请求、响应该如何设计，这就是执行步骤的关键了。对此，OAuth2 一共提出了四种不同的授权方式（这也是 OAuth2 复杂烦琐的主要原因），分别为：</p>
+<ul>
+<li>授权码模式（Authorization Code）</li>
+<li>隐式授权模式（Implicit）</li>
+<li>密码模式（Resource Owner Password Credentials）</li>
+<li>客户端模式（Client Credentials）</li>
+</ul>
+<h3 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h3><p>授权码模式是四种模式中最严（luō）谨（suō）的，它考虑到了几乎所有敏感信息泄漏的预防和后果。具体步骤的时序如图</p>
+<p><img src="/media/17369093589979/17369118806607.jpg"></p>
+<p>开始进行授权过程以前，第三方应用先要到授权服务器上进行注册，所谓注册，是指向认证服务器提供一个域名地址，然后从授权服务器中获取 ClientID 和 ClientSecret，以便能够顺利完成如下授权过程：</p>
+<ol>
+<li><p>第三方应用将资源所有者（用户）导向授权服务器的授权页面，并向授权服务器提供 ClientID 及用户同意授权后的回调 URI，这是一次客户端页面转向。</p>
+</li>
+<li><p>授权服务器根据 ClientID 确认第三方应用的身份，用户在授权服务器中决定是否同意向该身份的应用进行授权，用户认证的过程未定义在此步骤中，在此之前应该已经完成。</p>
+</li>
+<li><p>如果用户同意授权，授权服务器将转向第三方应用在第 1 步调用中提供的回调 URI，并附带上一个授权码和获取令牌的地址作为参数，这是第二次客户端页面转向。</p>
+</li>
+<li><p>第三方应用通过回调地址收到授权码，然后将授权码与自己的 ClientSecret 一起作为参数，通过服务器向授权服务器提供的获取令牌的服务地址发起请求，换取令牌。该服务器的地址应与注册时提供的域名处于同一个域中。</p>
+</li>
+<li><p>授权服务器核对授权码和 ClientSecret，确认无误后，向第三方应用授予令牌。令牌可以是一个或者两个，其中必定要有的是访问令牌（Access Token），可选的是刷新令牌（Refresh Token）。访问令牌用于到资源服务器获取资源，有效期较短，刷新令牌用于在访问令牌失效后重新获取，有效期较长。</p>
+</li>
+<li><p>资源服务器根据访问令牌所允许的权限，向第三方应用提供资源。</p>
+</li>
+</ol>
+<p>这个过程设计，已经考虑到了几乎所有合理的意外情况，再举几个最容易遇到的意外状况，以便能够更好地理解为何要这样设计 OAuth2。</p>
+<ul>
+<li><p>会不会有其他应用冒充第三方应用骗取授权？</p>
+<p>  ClientID 代表一个第三方应用的“用户名”，这项信息是可以完全公开的。但 ClientSecret 应当只有应用自己才知道，这个代表了第三方应用的“密码”。在第 5 步发放令牌时，调用者必须能够提供 ClientSecret 才能成功完成。只要第三方应用妥善保管好 ClientSecret，就没有人能够冒充它。</p>
+</li>
+<li><p>为什么要先发放授权码，再用授权码换令牌？</p>
+<p>  这是因为客户端转向（通常就是一次 HTTP 302 重定向）对于用户是可见的，换而言之，授权码可能会暴露给用户以及用户机器上的其他程序，但由于用户并没有 ClientSecret，光有授权码也是无法换取到令牌的，所以避免了令牌在传输转向过程中被泄漏的风险。</p>
+</li>
+<li><p>为什么要设计一个时限较长的刷新令牌和时限较短的访问令牌？不能直接把访问令牌的时间调长吗？</p>
+<p>  这是为了缓解 OAuth2 在实际应用中的一个主要缺陷，通常访问令牌一旦发放，除非超过了令牌中的有效期，否则很难（需要付出较大代价）有其他方式让它失效，所以访问令牌的时效性一般设计的比较短，譬如几个小时，如果还需要继续用，那就定期用刷新令牌去更新，授权服务器就可以在更新过程中决定是否还要继续给予授权。</p>
+</li>
+</ul>
+<h3 id="隐式授权模式"><a href="#隐式授权模式" class="headerlink" title="隐式授权模式"></a>隐式授权模式</h3><p>隐式授权省略掉了通过授权码换取令牌的步骤，整个授权过程都不需要服务端支持，一步到位。代价是在隐式授权中，授权服务器不会再去验证第三方应用的身份，因为已经没有应用服务器了，ClientSecret 没有人保管，就没有存在的意义了。但其实还是会限制第三方应用的回调 URI 地址必须与注册时提供的域名一致，尽管有可能被 DNS 污染之类的攻击所攻破，但仍算是尽可能努力一下。同样的原因，也不能避免令牌暴露给资源所有者，不能避免用户机器上可能意图不轨的其他程序、HTTP 的中间人攻击等风险了。</p>
+<p><img src="/media/17369093589979/17369203303815.jpg"></p>
+<p>在时序图所示的交互过程里，隐式模式与授权码模式的显著区别是授权服务器在得到用户授权后，直接返回了访问令牌，这显著地降低了安全性，但 OAuth2 仍然努力尽可能地做到相对安全，譬如在前面提到的隐式授权中，尽管不需要用到服务端，但仍然需要在注册时提供回调域名，此时会要求该域名与接受令牌的服务处于同一个域内。此外，同样基于安全考虑，在隐式模式中明确禁止发放刷新令牌。</p>
+<h3 id="密码模式"><a href="#密码模式" class="headerlink" title="密码模式"></a>密码模式</h3><p>授权码模式和隐私模式属于纯粹的授权模式，它们与认证没有直接的联系，如何认证用户的真实身份是与进行授权互相独立的过程。但在密码模式里，认证和授权就被整合成了同一个过程了。</p>
+<p>密码模式原本的设计意图是仅限于用户对第三方应用是高度可信任的场景中使用，因为用户需要把密码明文提供给第三方应用，第三方以此向授权服务器获取令牌。这种高度可信的第三方是极为较罕见的，尽管介绍 OAuth2 的材料中，经常举的例子是“操作系统作为第三方应用向授权服务器申请资源”，但真实应用中极少遇到这样的情况，合理性依然十分有限。</p>
+<p>如果要采用密码模式，那“第三方”属性就必须弱化，把“第三方”视作是系统中与授权服务器相对独立的子模块，在物理上独立于授权服务器部署，但是在逻辑上与授权服务器仍同属一个系统，这样将认证和授权一并完成的密码模式才会有合理的应用场景。</p>
+<p><img src="/media/17369093589979/17369205926376.jpg"></p>
+<h3 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h3><p> 客户端模式是指第三方应用（行文一致考虑，还是继续沿用这个称呼）以自己的名义，向授权服务器申请资源许可。此模式通常用于管理操作或者自动处理类型的场景中。</p>
+<p> <img src="/media/17369093589979/17369207278512.jpg"></p>
+<p>微服务架构并不提倡同一个系统的各服务间有默认的信任关系，所以服务之间调用也需要先进行认证授权，然后才能通信。此时，客户端模式便是一种常用的服务间认证授权的解决方案。</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:30.878Z" title="2025/5/16 11:11:30">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">8 分钟读完 (大约1246个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E4%BC%A0%E8%BE%93/">传输</a></p><div class="content"><p>[TOC]</p>
+<blockquote>
+<p>传输（Transport Security）<br>系统如何保证通过网络传输的信息无法被第三方窃听、篡改和冒充？</p>
+</blockquote>
+<h2 id="摘要、加密与签名"><a href="#摘要、加密与签名" class="headerlink" title="摘要、加密与签名"></a>摘要、加密与签名</h2><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>摘要也称之为数字摘要（Digital Digest）或数字指纹（Digital Fingerprint）。JWT 令牌中默认的签名信息是对令牌头、负载和密钥三者通过令牌头中指定的哈希算法（HMAC SHA256）计算出来的摘要值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">signature = SHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload) , secret)</span><br></pre></td></tr></table></figure>
+
+<p>理想的哈希算法都具备两个特性：</p>
+<ul>
+<li><p>一是易变性，这是指算法的输入端发生了任何一点细微变动，都会引发雪崩效应（Avalanche Effect），使得输出端的结果产生极大的变化。这个特性常被用来做校验，保护信息未被篡改，譬如互联网上下载大文件，常会附有一个哈希校验码，以确保下载下来的文件没有因网络或其他原因与原文件产生任何偏差。</p>
+</li>
+<li><p>二是不可逆性，摘要的过程是单向的，不可能从摘要的结果中逆向还原出输入值来。这点只要具备初中数学知识就能想明白，世间的信息有无穷多种，而摘要的结果无论其位数是 32、128、512 Bits，再大也总归是个有限的数字，因此输入数据与输出的摘要结果必然不是一一对应的关系，如果我把一部电影做摘要形成 256 Bits 的哈希值，应该没有人会指望能从这个哈希值中还原出一部电影的。偶尔能听到 MD5、SHA1 或其他哈希算法被破解了的新闻，这里的“破解”并不是“解密”的意思，而是指找到了该算法的高效率碰撞方法，能够在合理的时间内生成两个摘要结果相同的输入比特流，但并不能指定这两个输入流中的某一个，更不代表碰撞产生的比特流就会是原来的输入源。</p>
+</li>
+</ul>
+<p>由这两个特点可见，摘要的意义是在源信息不泄漏的前提下辨别其真伪。易变性保证了从公开的特征上可以甄别出是否来自于源信息，不可逆性保证了从公开的特征并不会暴露出源信息，这与今天用做身份甄别的指纹、面容和虹膜的生物特征是具有高度可比性的。在一些场合中，摘要也会被借用来做加密（如保密中介绍的慢哈希 Bcrypt 算法）和签名（如 JWT 签名中的 HMAC SHA256 算法），但在严格意义上看，摘要与这两者是有本质的区别。</p>
+<h3 id="加密与签名"><a href="#加密与签名" class="headerlink" title="加密与签名"></a>加密与签名</h3><p>加密与摘要的本质区别在于加密是可逆的，逆过程就是解密。 在经典密码学时代，加密的安全主要是依靠机密性来保证的，即依靠保护加密算法或算法的执行参数不被泄漏来保障信息的安全。而现代密码学不依靠机密性，加解密算法都是完全公开的，安全建立在特定问题的计算复杂度之上，具体是指算法根据输入端计算输出结果耗费的算力资源很小，但根据输出端的结果反过来推算原本的输入，耗费的算力就极其庞大。</p>
+<p>根据加密与解密是否采用同一个密钥，<strong>现代密码学算法可分为对称加密算法和非对称加密两大类型</strong></p>
+<ul>
+<li><p>对称加密算法</p>
+<ul>
+<li>定义：对称加密算法使用相同的密钥进行加密和解密操作。</li>
+<li>特点：<br>  加密速度快，适合大量数据的加密。<br>  密钥管理较为复杂，因为通信双方需要安全地共享同一个密钥。</li>
+<li>常见算法：<br>  AES（高级加密标准）<br>  DES（数据加密标准）<br>  3DES（三重数据加密标准）</li>
+</ul>
+</li>
+<li><p>非对称加密算法</p>
+<ul>
+<li>定义：非对称加密算法使用一对密钥，即公钥和私钥。公钥用于加密，私钥用于解密；或者私钥用于签名，公钥用于验证签名。</li>
+<li>特点：<br>  安全性高，因为私钥不需要传输，只有持有者知道。<br>  加密速度相对较慢，适合小量数据的加密或用于密钥交换。</li>
+<li>常见算法：<br>  RSA（Rivest-Shamir-Adleman）<br>  ECC（椭圆曲线密码学）<br>  DSA（数字签名算法</li>
+</ul>
+</li>
+</ul>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:34.767Z" title="2025/5/16 11:11:34">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">22 分钟读完 (大约3326个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E5%87%AD%E8%AF%81/">凭证（Credentials）</a></p><div class="content"><blockquote>
 <p>凭证（Credentials）<br>系统如何保证它与用户之间的承诺是双方当时真实意图的体现，是准确、完整且不可抵赖的？</p>
 </blockquote>
 <p>[TOC]</p>
@@ -166,39 +280,6 @@
 <li><p>比较上一步的结果和数据库储存的哈希值是否相同，如果相同那么密码正确，反之密码错误。</p>
  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">authentication = compare(result, server_hash) // yes</span><br></pre></td></tr></table></figure></li>
 </ol>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:30.878Z" title="2025/5/16 11:11:30">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">8 分钟读完 (大约1246个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E4%BC%A0%E8%BE%93/">传输</a></p><div class="content"><p>[TOC]</p>
-<blockquote>
-<p>传输（Transport Security）<br>系统如何保证通过网络传输的信息无法被第三方窃听、篡改和冒充？</p>
-</blockquote>
-<h2 id="摘要、加密与签名"><a href="#摘要、加密与签名" class="headerlink" title="摘要、加密与签名"></a>摘要、加密与签名</h2><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>摘要也称之为数字摘要（Digital Digest）或数字指纹（Digital Fingerprint）。JWT 令牌中默认的签名信息是对令牌头、负载和密钥三者通过令牌头中指定的哈希算法（HMAC SHA256）计算出来的摘要值。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">signature = SHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload) , secret)</span><br></pre></td></tr></table></figure>
-
-<p>理想的哈希算法都具备两个特性：</p>
-<ul>
-<li><p>一是易变性，这是指算法的输入端发生了任何一点细微变动，都会引发雪崩效应（Avalanche Effect），使得输出端的结果产生极大的变化。这个特性常被用来做校验，保护信息未被篡改，譬如互联网上下载大文件，常会附有一个哈希校验码，以确保下载下来的文件没有因网络或其他原因与原文件产生任何偏差。</p>
-</li>
-<li><p>二是不可逆性，摘要的过程是单向的，不可能从摘要的结果中逆向还原出输入值来。这点只要具备初中数学知识就能想明白，世间的信息有无穷多种，而摘要的结果无论其位数是 32、128、512 Bits，再大也总归是个有限的数字，因此输入数据与输出的摘要结果必然不是一一对应的关系，如果我把一部电影做摘要形成 256 Bits 的哈希值，应该没有人会指望能从这个哈希值中还原出一部电影的。偶尔能听到 MD5、SHA1 或其他哈希算法被破解了的新闻，这里的“破解”并不是“解密”的意思，而是指找到了该算法的高效率碰撞方法，能够在合理的时间内生成两个摘要结果相同的输入比特流，但并不能指定这两个输入流中的某一个，更不代表碰撞产生的比特流就会是原来的输入源。</p>
-</li>
-</ul>
-<p>由这两个特点可见，摘要的意义是在源信息不泄漏的前提下辨别其真伪。易变性保证了从公开的特征上可以甄别出是否来自于源信息，不可逆性保证了从公开的特征并不会暴露出源信息，这与今天用做身份甄别的指纹、面容和虹膜的生物特征是具有高度可比性的。在一些场合中，摘要也会被借用来做加密（如保密中介绍的慢哈希 Bcrypt 算法）和签名（如 JWT 签名中的 HMAC SHA256 算法），但在严格意义上看，摘要与这两者是有本质的区别。</p>
-<h3 id="加密与签名"><a href="#加密与签名" class="headerlink" title="加密与签名"></a>加密与签名</h3><p>加密与摘要的本质区别在于加密是可逆的，逆过程就是解密。 在经典密码学时代，加密的安全主要是依靠机密性来保证的，即依靠保护加密算法或算法的执行参数不被泄漏来保障信息的安全。而现代密码学不依靠机密性，加解密算法都是完全公开的，安全建立在特定问题的计算复杂度之上，具体是指算法根据输入端计算输出结果耗费的算力资源很小，但根据输出端的结果反过来推算原本的输入，耗费的算力就极其庞大。</p>
-<p>根据加密与解密是否采用同一个密钥，<strong>现代密码学算法可分为对称加密算法和非对称加密两大类型</strong></p>
-<ul>
-<li><p>对称加密算法</p>
-<ul>
-<li>定义：对称加密算法使用相同的密钥进行加密和解密操作。</li>
-<li>特点：<br>  加密速度快，适合大量数据的加密。<br>  密钥管理较为复杂，因为通信双方需要安全地共享同一个密钥。</li>
-<li>常见算法：<br>  AES（高级加密标准）<br>  DES（数据加密标准）<br>  3DES（三重数据加密标准）</li>
-</ul>
-</li>
-<li><p>非对称加密算法</p>
-<ul>
-<li>定义：非对称加密算法使用一对密钥，即公钥和私钥。公钥用于加密，私钥用于解密；或者私钥用于签名，公钥用于验证签名。</li>
-<li>特点：<br>  安全性高，因为私钥不需要传输，只有持有者知道。<br>  加密速度相对较慢，适合小量数据的加密或用于密钥交换。</li>
-<li>常见算法：<br>  RSA（Rivest-Shamir-Adleman）<br>  ECC（椭圆曲线密码学）<br>  DSA（数字签名算法</li>
-</ul>
-</li>
-</ul>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:37.410Z" title="2025/5/16 11:11:37">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">16 分钟读完 (大约2376个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E8%AE%A4%E8%AF%81/">认证（Authentication）</a></p><div class="content"><p>[TOC]</p>
 <blockquote>
 <p>认证（Authentication）<br>系统如何正确分辨出操作用户的真实身份？</p>
@@ -278,88 +359,7 @@
 </ol>
 <p>WebAuthn 采用非对称加密的公钥、私钥替代传统的密码，这是非常理想的认证方案，私钥是保密的，只有验证器需要知道它，连用户本人都不需要知道，也就没有人为泄漏的可能；公钥是公开的，可以被任何人看到或存储。公钥可用于验证私钥生成的签名，但不能用来签名，除了得知私钥外，没有其他途径能够生成可被公钥验证为有效的签名，这样服务器就可以通过公钥是否能够解密来判断最终用户的身份是否合法。</p>
 <p>WebAuthn 还一揽子地解决了传统密码在网络传输上的风险，无论密码是否客户端进行加密、如何加密，对防御中间人攻击来说都是没有意义的。更值得夸赞的是 WebAuthn 为登录过程带来极大的便捷性，不仅注册和验证的用户体验十分优秀，而且彻底避免了用户在一个网站上泄漏密码，所有使用相同密码的网站都受到攻击的问题，<strong>这个优点使得用户无须再为每个网站想不同的密码</strong>。</p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:42.877Z" title="2025/5/16 11:11:42">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">23 分钟读完 (大约3384个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E6%8E%88%E6%9D%83/">授权（ Authorization）</a></p><div class="content"><p>[TOC]</p>
-<blockquote>
-<p>授权（ Authorization）<br>    系统如何控制一个用户该看到哪些数据、能操作哪些功能？</p>
-</blockquote>
-<ul>
-<li><p>确保授权的过程可靠：对于单一系统来说，授权的过程是比较容易做到可控的，以前很多语境上提到授权，实质上讲的都是访问控制，理论上两者是应该分开的。而在涉及多方的系统中，授权过程则是一个比较困难却必须严肃对待的问题：如何既让第三方系统能够访问到所需的资源，又能保证其不泄露用户的敏感数据呢？常用的多方授权协议主要有 OAuth2 和 SAML 2.0（两个协议涵盖的功能并不是直接对等的）。</p>
-</li>
-<li><p>确保授权的结果可控：授权的结果用于对程序功能或者资源的访问控制（Access Control），成理论体系的权限控制模型有很多，譬如自主访问控制（Discretionary Access Control，DAC）、强制访问控制（Mandatory Access Control，MAC）、基于属性的访问控制（Attribute-Based Access Control，ABAC），还有最为常用的基于角色的访问控制（Role-Based Access Control，RBAC）。</p>
-</li>
-</ul>
-<h2 id="RBAC"><a href="#RBAC" class="headerlink" title="RBAC"></a>RBAC</h2><p>所有的访问控制模型，实质上都是在解决同一个问题：“谁（User）拥有什么权限（Authority）去操作（Operation）哪些资源（Resource）”。</p>
-<p><img src="/media/17369093589979/17369101080328.jpg"></p>
-<ul>
-<li>RBAC-1 模型的角色权限继承关系。譬如描述开发经理应该和开发人员一样具有代码提交的权限，描述开发人员都应该和任何公司员工一样具有食堂就餐的权限，就可以直接将食堂就餐赋予公司员工的角色上，把代码提交赋予到开发人员的角色上，再让开发人员的角色从公司员工派生，开发经理的角色从开发人员中派生即可。</li>
-</ul>
-<p><img src="/media/17369093589979/17369103287507.jpg"></p>
-<ul>
-<li>RBAC-2 模型的角色职责分离关系。互斥性要求权限被赋予角色时，或角色被赋予用户时应遵循的强制性职责分离规定。举个例子，角色的互斥约束可限制同一用户只能分配到一组互斥角色集合中至多一个角色，譬如不能让同一名员工既当会计，也当出纳，否则资金安全无法保证。角色的基数约束可限制某一个用户拥有的最大角色数目，譬如不能让同一名员工从产品、设计、开发、测试全部包揽，否则产品质量无法保证。</li>
-</ul>
-<p><img src="/media/17369093589979/17369104337621.jpg"></p>
-<h2 id="OAuth2"><a href="#OAuth2" class="headerlink" title="OAuth2"></a>OAuth2</h2><p> OAuth2 是面向于解决第三方应用（Third-Party Application）的认证授权协议。如果你的系统并不涉及第三方，那引入 OAuth2 其实并无必要。</p>
-<p> OAuth2 给出了多种解决办法，这些办法的共同特征是以令牌（Token）代替用户密码作为授权的凭证。有了令牌之后，哪怕令牌被泄漏，也不会导致密码的泄漏；令牌上可以设定访问资源的范围以及时效性；每个应用都持有独立的令牌，哪个失效都不会波及其他。这样上面提出的三个问题就都解决了。有了一层令牌之后，整个授权的流程如图</p>
-<p> <img src="/media/17369093589979/17369109279655.jpg"></p>
-<ul>
-<li><p>第三方应用（Third-Party Application）：需要得到授权访问我资源的那个应用</p>
-</li>
-<li><p>授权服务器（Authorization Server）：能够根据我的意愿提供授权（授权之前肯定已经进行了必要的认证过程，但它与授权可以没有直接关系）的服务器。</p>
-</li>
-<li><p>资源服务器（Resource Server）：能够提供第三方应用所需资源的服务器，它与认证服务可以是相同的服务器，也可以是不同的服务器</p>
-</li>
-<li><p>资源所有者（Resource Owner）： 拥有授权权限的人，即此场景中的“我”。</p>
-</li>
-<li><p>操作代理（User Agent）：指用户用来访问服务器的工具，对于人类用户来说，这个通常是指浏览器，但在微服务中一个服务经常会作为另一个服务的用户，此时指的可能就是 HttpClient、RPCClient 或者其他访问途径。</p>
-</li>
-</ul>
-<p>用令牌代替密码”确实是解决问题的好方法，但这充其量只能算个思路，距离可实施的步骤还是不够具体的，时序图中的“要求&#x2F;同意授权”、“要求&#x2F;同意发放令牌”、“要求&#x2F;同意开放资源”几个服务请求、响应该如何设计，这就是执行步骤的关键了。对此，OAuth2 一共提出了四种不同的授权方式（这也是 OAuth2 复杂烦琐的主要原因），分别为：</p>
-<ul>
-<li>授权码模式（Authorization Code）</li>
-<li>隐式授权模式（Implicit）</li>
-<li>密码模式（Resource Owner Password Credentials）</li>
-<li>客户端模式（Client Credentials）</li>
-</ul>
-<h3 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h3><p>授权码模式是四种模式中最严（luō）谨（suō）的，它考虑到了几乎所有敏感信息泄漏的预防和后果。具体步骤的时序如图</p>
-<p><img src="/media/17369093589979/17369118806607.jpg"></p>
-<p>开始进行授权过程以前，第三方应用先要到授权服务器上进行注册，所谓注册，是指向认证服务器提供一个域名地址，然后从授权服务器中获取 ClientID 和 ClientSecret，以便能够顺利完成如下授权过程：</p>
-<ol>
-<li><p>第三方应用将资源所有者（用户）导向授权服务器的授权页面，并向授权服务器提供 ClientID 及用户同意授权后的回调 URI，这是一次客户端页面转向。</p>
-</li>
-<li><p>授权服务器根据 ClientID 确认第三方应用的身份，用户在授权服务器中决定是否同意向该身份的应用进行授权，用户认证的过程未定义在此步骤中，在此之前应该已经完成。</p>
-</li>
-<li><p>如果用户同意授权，授权服务器将转向第三方应用在第 1 步调用中提供的回调 URI，并附带上一个授权码和获取令牌的地址作为参数，这是第二次客户端页面转向。</p>
-</li>
-<li><p>第三方应用通过回调地址收到授权码，然后将授权码与自己的 ClientSecret 一起作为参数，通过服务器向授权服务器提供的获取令牌的服务地址发起请求，换取令牌。该服务器的地址应与注册时提供的域名处于同一个域中。</p>
-</li>
-<li><p>授权服务器核对授权码和 ClientSecret，确认无误后，向第三方应用授予令牌。令牌可以是一个或者两个，其中必定要有的是访问令牌（Access Token），可选的是刷新令牌（Refresh Token）。访问令牌用于到资源服务器获取资源，有效期较短，刷新令牌用于在访问令牌失效后重新获取，有效期较长。</p>
-</li>
-<li><p>资源服务器根据访问令牌所允许的权限，向第三方应用提供资源。</p>
-</li>
-</ol>
-<p>这个过程设计，已经考虑到了几乎所有合理的意外情况，再举几个最容易遇到的意外状况，以便能够更好地理解为何要这样设计 OAuth2。</p>
-<ul>
-<li><p>会不会有其他应用冒充第三方应用骗取授权？</p>
-<p>  ClientID 代表一个第三方应用的“用户名”，这项信息是可以完全公开的。但 ClientSecret 应当只有应用自己才知道，这个代表了第三方应用的“密码”。在第 5 步发放令牌时，调用者必须能够提供 ClientSecret 才能成功完成。只要第三方应用妥善保管好 ClientSecret，就没有人能够冒充它。</p>
-</li>
-<li><p>为什么要先发放授权码，再用授权码换令牌？</p>
-<p>  这是因为客户端转向（通常就是一次 HTTP 302 重定向）对于用户是可见的，换而言之，授权码可能会暴露给用户以及用户机器上的其他程序，但由于用户并没有 ClientSecret，光有授权码也是无法换取到令牌的，所以避免了令牌在传输转向过程中被泄漏的风险。</p>
-</li>
-<li><p>为什么要设计一个时限较长的刷新令牌和时限较短的访问令牌？不能直接把访问令牌的时间调长吗？</p>
-<p>  这是为了缓解 OAuth2 在实际应用中的一个主要缺陷，通常访问令牌一旦发放，除非超过了令牌中的有效期，否则很难（需要付出较大代价）有其他方式让它失效，所以访问令牌的时效性一般设计的比较短，譬如几个小时，如果还需要继续用，那就定期用刷新令牌去更新，授权服务器就可以在更新过程中决定是否还要继续给予授权。</p>
-</li>
-</ul>
-<h3 id="隐式授权模式"><a href="#隐式授权模式" class="headerlink" title="隐式授权模式"></a>隐式授权模式</h3><p>隐式授权省略掉了通过授权码换取令牌的步骤，整个授权过程都不需要服务端支持，一步到位。代价是在隐式授权中，授权服务器不会再去验证第三方应用的身份，因为已经没有应用服务器了，ClientSecret 没有人保管，就没有存在的意义了。但其实还是会限制第三方应用的回调 URI 地址必须与注册时提供的域名一致，尽管有可能被 DNS 污染之类的攻击所攻破，但仍算是尽可能努力一下。同样的原因，也不能避免令牌暴露给资源所有者，不能避免用户机器上可能意图不轨的其他程序、HTTP 的中间人攻击等风险了。</p>
-<p><img src="/media/17369093589979/17369203303815.jpg"></p>
-<p>在时序图所示的交互过程里，隐式模式与授权码模式的显著区别是授权服务器在得到用户授权后，直接返回了访问令牌，这显著地降低了安全性，但 OAuth2 仍然努力尽可能地做到相对安全，譬如在前面提到的隐式授权中，尽管不需要用到服务端，但仍然需要在注册时提供回调域名，此时会要求该域名与接受令牌的服务处于同一个域内。此外，同样基于安全考虑，在隐式模式中明确禁止发放刷新令牌。</p>
-<h3 id="密码模式"><a href="#密码模式" class="headerlink" title="密码模式"></a>密码模式</h3><p>授权码模式和隐私模式属于纯粹的授权模式，它们与认证没有直接的联系，如何认证用户的真实身份是与进行授权互相独立的过程。但在密码模式里，认证和授权就被整合成了同一个过程了。</p>
-<p>密码模式原本的设计意图是仅限于用户对第三方应用是高度可信任的场景中使用，因为用户需要把密码明文提供给第三方应用，第三方以此向授权服务器获取令牌。这种高度可信的第三方是极为较罕见的，尽管介绍 OAuth2 的材料中，经常举的例子是“操作系统作为第三方应用向授权服务器申请资源”，但真实应用中极少遇到这样的情况，合理性依然十分有限。</p>
-<p>如果要采用密码模式，那“第三方”属性就必须弱化，把“第三方”视作是系统中与授权服务器相对独立的子模块，在物理上独立于授权服务器部署，但是在逻辑上与授权服务器仍同属一个系统，这样将认证和授权一并完成的密码模式才会有合理的应用场景。</p>
-<p><img src="/media/17369093589979/17369205926376.jpg"></p>
-<h3 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h3><p> 客户端模式是指第三方应用（行文一致考虑，还是继续沿用这个称呼）以自己的名义，向授权服务器申请资源许可。此模式通常用于管理操作或者自动处理类型的场景中。</p>
-<p> <img src="/media/17369093589979/17369207278512.jpg"></p>
-<p>微服务架构并不提倡同一个系统的各服务间有默认的信任关系，所以服务之间调用也需要先进行认证授权，然后才能通信。此时，客户端模式便是一种常用的服务间认证授权的解决方案。</p>
-</div></article></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/GeoHash/">GeoHash</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/Scan%E6%8C%87%E4%BB%A4/">Scan指令</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/Stream/">Stream</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/codis%20%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88/">codis 集群方案</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+</div></article></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/PubSub%20%E6%B6%88%E6%81%AF%E5%A4%9A%E6%92%AD%20(%E7%BC%BA%E7%82%B9%E5%A4%9A%E4%B8%8D%E8%A2%AB%E4%BD%BF%E7%94%A8)/">PubSub 消息多播</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/redis%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">redis 分布式锁</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/redis%20list%E5%BA%94%E7%94%A8%E2%80%94%E2%80%94%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">redis list应用——延迟队列</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/codis%20%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88/">codis 集群方案</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
             article: {
                 highlight: {
                     clipboard: true,
