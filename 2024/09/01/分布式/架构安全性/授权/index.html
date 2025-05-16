@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>授权（ Authorization） - ZCCT</title><link rel="manifest" href="/zclvct/zcct-blog.git/manifest.json"><meta name="application-name" content="ZCCT"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ZCCT"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="[TOC]  授权（ Authorization）    系统如何控制一个用户该看到哪些数据、能操作哪些功能？   确保授权的过程可靠：对于单一系统来说，授权的过程是比较容易做到可控的，以前很多语境上提到授权，实质上讲的都是访问控制，理论上两者是应该分开的。而在涉及多方的系统中，授权过程则是一个比较困难却必须严肃对待的问题：如何既让第三方系统能够访问到所需的资源，又能保证其不泄露用户的敏感数据呢？"><meta property="og:type" content="blog"><meta property="og:title" content="授权（ Authorization）"><meta property="og:url" content="https://gitee.com/zclvct/zcct-blog.git/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E6%8E%88%E6%9D%83/"><meta property="og:site_name" content="ZCCT"><meta property="og:description" content="[TOC]  授权（ Authorization）    系统如何控制一个用户该看到哪些数据、能操作哪些功能？   确保授权的过程可靠：对于单一系统来说，授权的过程是比较容易做到可控的，以前很多语境上提到授权，实质上讲的都是访问控制，理论上两者是应该分开的。而在涉及多方的系统中，授权过程则是一个比较困难却必须严肃对待的问题：如何既让第三方系统能够访问到所需的资源，又能保证其不泄露用户的敏感数据呢？"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369101080328.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369103287507.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369104337621.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369109279655.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369118806607.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369203303815.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369205926376.jpg"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17369093589979/17369207278512.jpg"><meta property="article:published_time" content="2024-09-01T04:00:00.000Z"><meta property="article:modified_time" content="2025-05-16T03:11:42.877Z"><meta property="article:author" content="zcct"><meta property="article:tag" content="架构安全性"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://gitee.com/zclvct.io/media/17369093589979/17369101080328.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://gitee.com/zclvct/zcct-blog.git/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E6%8E%88%E6%9D%83/"},"headline":"授权（ Authorization）","image":["https://gitee.com/zclvct.io/media/17369093589979/17369101080328.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369103287507.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369104337621.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369109279655.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369118806607.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369203303815.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369205926376.jpg","https://gitee.com/zclvct.io/media/17369093589979/17369207278512.jpg"],"datePublished":"2024-09-01T04:00:00.000Z","dateModified":"2025-05-16T03:11:42.877Z","author":{"@type":"Person","name":"zcct"},"publisher":{"@type":"Organization","name":"ZCCT","logo":{"@type":"ImageObject","url":"https://gitee.com/img/logo.svg"}},"description":"[TOC]  授权（ Authorization）    系统如何控制一个用户该看到哪些数据、能操作哪些功能？   确保授权的过程可靠：对于单一系统来说，授权的过程是比较容易做到可控的，以前很多语境上提到授权，实质上讲的都是访问控制，理论上两者是应该分开的。而在涉及多方的系统中，授权过程则是一个比较困难却必须严肃对待的问题：如何既让第三方系统能够访问到所需的资源，又能保证其不泄露用户的敏感数据呢？"}</script><link rel="canonical" href="https://gitee.com/zclvct/zcct-blog.git/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E6%8E%88%E6%9D%83/"><link rel="icon" href="/zclvct/zcct-blog.git/img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/zclvct/zcct-blog.git/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/zclvct/zcct-blog.git/"><img src="/zclvct/zcct-blog.git/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/zclvct/zcct-blog.git/">主页</a><a class="navbar-item" href="/zclvct/zcct-blog.git/archives">档案</a><a class="navbar-item" href="/zclvct/zcct-blog.git/categories">分类</a><a class="navbar-item" href="/zclvct/zcct-blog.git/tags">标签</a><a class="navbar-item" href="/zclvct/zcct-blog.git/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:42.877Z" title="2025/5/16 11:11:42">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/zclvct/zcct-blog.git/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">23 分钟读完 (大约3384个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">授权（ Authorization）</h1><div class="content"><p>[TOC]</p>
+<blockquote>
+<p>授权（ Authorization）<br>    系统如何控制一个用户该看到哪些数据、能操作哪些功能？</p>
+</blockquote>
+<ul>
+<li><p>确保授权的过程可靠：对于单一系统来说，授权的过程是比较容易做到可控的，以前很多语境上提到授权，实质上讲的都是访问控制，理论上两者是应该分开的。而在涉及多方的系统中，授权过程则是一个比较困难却必须严肃对待的问题：如何既让第三方系统能够访问到所需的资源，又能保证其不泄露用户的敏感数据呢？常用的多方授权协议主要有 OAuth2 和 SAML 2.0（两个协议涵盖的功能并不是直接对等的）。</p>
+</li>
+<li><p>确保授权的结果可控：授权的结果用于对程序功能或者资源的访问控制（Access Control），成理论体系的权限控制模型有很多，譬如自主访问控制（Discretionary Access Control，DAC）、强制访问控制（Mandatory Access Control，MAC）、基于属性的访问控制（Attribute-Based Access Control，ABAC），还有最为常用的基于角色的访问控制（Role-Based Access Control，RBAC）。</p>
+</li>
+</ul>
+<h2 id="RBAC"><a href="#RBAC" class="headerlink" title="RBAC"></a>RBAC</h2><p>所有的访问控制模型，实质上都是在解决同一个问题：“谁（User）拥有什么权限（Authority）去操作（Operation）哪些资源（Resource）”。</p>
+<p><img src="/zclvct.io/media/17369093589979/17369101080328.jpg"></p>
+<ul>
+<li>RBAC-1 模型的角色权限继承关系。譬如描述开发经理应该和开发人员一样具有代码提交的权限，描述开发人员都应该和任何公司员工一样具有食堂就餐的权限，就可以直接将食堂就餐赋予公司员工的角色上，把代码提交赋予到开发人员的角色上，再让开发人员的角色从公司员工派生，开发经理的角色从开发人员中派生即可。</li>
+</ul>
+<p><img src="/zclvct.io/media/17369093589979/17369103287507.jpg"></p>
+<ul>
+<li>RBAC-2 模型的角色职责分离关系。互斥性要求权限被赋予角色时，或角色被赋予用户时应遵循的强制性职责分离规定。举个例子，角色的互斥约束可限制同一用户只能分配到一组互斥角色集合中至多一个角色，譬如不能让同一名员工既当会计，也当出纳，否则资金安全无法保证。角色的基数约束可限制某一个用户拥有的最大角色数目，譬如不能让同一名员工从产品、设计、开发、测试全部包揽，否则产品质量无法保证。</li>
+</ul>
+<p><img src="/zclvct.io/media/17369093589979/17369104337621.jpg"></p>
+<h2 id="OAuth2"><a href="#OAuth2" class="headerlink" title="OAuth2"></a>OAuth2</h2><p> OAuth2 是面向于解决第三方应用（Third-Party Application）的认证授权协议。如果你的系统并不涉及第三方，那引入 OAuth2 其实并无必要。</p>
+<p> OAuth2 给出了多种解决办法，这些办法的共同特征是以令牌（Token）代替用户密码作为授权的凭证。有了令牌之后，哪怕令牌被泄漏，也不会导致密码的泄漏；令牌上可以设定访问资源的范围以及时效性；每个应用都持有独立的令牌，哪个失效都不会波及其他。这样上面提出的三个问题就都解决了。有了一层令牌之后，整个授权的流程如图</p>
+<p> <img src="/zclvct.io/media/17369093589979/17369109279655.jpg"></p>
+<ul>
+<li><p>第三方应用（Third-Party Application）：需要得到授权访问我资源的那个应用</p>
+</li>
+<li><p>授权服务器（Authorization Server）：能够根据我的意愿提供授权（授权之前肯定已经进行了必要的认证过程，但它与授权可以没有直接关系）的服务器。</p>
+</li>
+<li><p>资源服务器（Resource Server）：能够提供第三方应用所需资源的服务器，它与认证服务可以是相同的服务器，也可以是不同的服务器</p>
+</li>
+<li><p>资源所有者（Resource Owner）： 拥有授权权限的人，即此场景中的“我”。</p>
+</li>
+<li><p>操作代理（User Agent）：指用户用来访问服务器的工具，对于人类用户来说，这个通常是指浏览器，但在微服务中一个服务经常会作为另一个服务的用户，此时指的可能就是 HttpClient、RPCClient 或者其他访问途径。</p>
+</li>
+</ul>
+<p>用令牌代替密码”确实是解决问题的好方法，但这充其量只能算个思路，距离可实施的步骤还是不够具体的，时序图中的“要求&#x2F;同意授权”、“要求&#x2F;同意发放令牌”、“要求&#x2F;同意开放资源”几个服务请求、响应该如何设计，这就是执行步骤的关键了。对此，OAuth2 一共提出了四种不同的授权方式（这也是 OAuth2 复杂烦琐的主要原因），分别为：</p>
+<ul>
+<li>授权码模式（Authorization Code）</li>
+<li>隐式授权模式（Implicit）</li>
+<li>密码模式（Resource Owner Password Credentials）</li>
+<li>客户端模式（Client Credentials）</li>
+</ul>
+<h3 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h3><p>授权码模式是四种模式中最严（luō）谨（suō）的，它考虑到了几乎所有敏感信息泄漏的预防和后果。具体步骤的时序如图</p>
+<p><img src="/zclvct.io/media/17369093589979/17369118806607.jpg"></p>
+<p>开始进行授权过程以前，第三方应用先要到授权服务器上进行注册，所谓注册，是指向认证服务器提供一个域名地址，然后从授权服务器中获取 ClientID 和 ClientSecret，以便能够顺利完成如下授权过程：</p>
+<ol>
+<li><p>第三方应用将资源所有者（用户）导向授权服务器的授权页面，并向授权服务器提供 ClientID 及用户同意授权后的回调 URI，这是一次客户端页面转向。</p>
+</li>
+<li><p>授权服务器根据 ClientID 确认第三方应用的身份，用户在授权服务器中决定是否同意向该身份的应用进行授权，用户认证的过程未定义在此步骤中，在此之前应该已经完成。</p>
+</li>
+<li><p>如果用户同意授权，授权服务器将转向第三方应用在第 1 步调用中提供的回调 URI，并附带上一个授权码和获取令牌的地址作为参数，这是第二次客户端页面转向。</p>
+</li>
+<li><p>第三方应用通过回调地址收到授权码，然后将授权码与自己的 ClientSecret 一起作为参数，通过服务器向授权服务器提供的获取令牌的服务地址发起请求，换取令牌。该服务器的地址应与注册时提供的域名处于同一个域中。</p>
+</li>
+<li><p>授权服务器核对授权码和 ClientSecret，确认无误后，向第三方应用授予令牌。令牌可以是一个或者两个，其中必定要有的是访问令牌（Access Token），可选的是刷新令牌（Refresh Token）。访问令牌用于到资源服务器获取资源，有效期较短，刷新令牌用于在访问令牌失效后重新获取，有效期较长。</p>
+</li>
+<li><p>资源服务器根据访问令牌所允许的权限，向第三方应用提供资源。</p>
+</li>
+</ol>
+<p>这个过程设计，已经考虑到了几乎所有合理的意外情况，再举几个最容易遇到的意外状况，以便能够更好地理解为何要这样设计 OAuth2。</p>
+<ul>
+<li><p>会不会有其他应用冒充第三方应用骗取授权？</p>
+<p>  ClientID 代表一个第三方应用的“用户名”，这项信息是可以完全公开的。但 ClientSecret 应当只有应用自己才知道，这个代表了第三方应用的“密码”。在第 5 步发放令牌时，调用者必须能够提供 ClientSecret 才能成功完成。只要第三方应用妥善保管好 ClientSecret，就没有人能够冒充它。</p>
+</li>
+<li><p>为什么要先发放授权码，再用授权码换令牌？</p>
+<p>  这是因为客户端转向（通常就是一次 HTTP 302 重定向）对于用户是可见的，换而言之，授权码可能会暴露给用户以及用户机器上的其他程序，但由于用户并没有 ClientSecret，光有授权码也是无法换取到令牌的，所以避免了令牌在传输转向过程中被泄漏的风险。</p>
+</li>
+<li><p>为什么要设计一个时限较长的刷新令牌和时限较短的访问令牌？不能直接把访问令牌的时间调长吗？</p>
+<p>  这是为了缓解 OAuth2 在实际应用中的一个主要缺陷，通常访问令牌一旦发放，除非超过了令牌中的有效期，否则很难（需要付出较大代价）有其他方式让它失效，所以访问令牌的时效性一般设计的比较短，譬如几个小时，如果还需要继续用，那就定期用刷新令牌去更新，授权服务器就可以在更新过程中决定是否还要继续给予授权。</p>
+</li>
+</ul>
+<h3 id="隐式授权模式"><a href="#隐式授权模式" class="headerlink" title="隐式授权模式"></a>隐式授权模式</h3><p>隐式授权省略掉了通过授权码换取令牌的步骤，整个授权过程都不需要服务端支持，一步到位。代价是在隐式授权中，授权服务器不会再去验证第三方应用的身份，因为已经没有应用服务器了，ClientSecret 没有人保管，就没有存在的意义了。但其实还是会限制第三方应用的回调 URI 地址必须与注册时提供的域名一致，尽管有可能被 DNS 污染之类的攻击所攻破，但仍算是尽可能努力一下。同样的原因，也不能避免令牌暴露给资源所有者，不能避免用户机器上可能意图不轨的其他程序、HTTP 的中间人攻击等风险了。</p>
+<p><img src="/zclvct.io/media/17369093589979/17369203303815.jpg"></p>
+<p>在时序图所示的交互过程里，隐式模式与授权码模式的显著区别是授权服务器在得到用户授权后，直接返回了访问令牌，这显著地降低了安全性，但 OAuth2 仍然努力尽可能地做到相对安全，譬如在前面提到的隐式授权中，尽管不需要用到服务端，但仍然需要在注册时提供回调域名，此时会要求该域名与接受令牌的服务处于同一个域内。此外，同样基于安全考虑，在隐式模式中明确禁止发放刷新令牌。</p>
+<h3 id="密码模式"><a href="#密码模式" class="headerlink" title="密码模式"></a>密码模式</h3><p>授权码模式和隐私模式属于纯粹的授权模式，它们与认证没有直接的联系，如何认证用户的真实身份是与进行授权互相独立的过程。但在密码模式里，认证和授权就被整合成了同一个过程了。</p>
+<p>密码模式原本的设计意图是仅限于用户对第三方应用是高度可信任的场景中使用，因为用户需要把密码明文提供给第三方应用，第三方以此向授权服务器获取令牌。这种高度可信的第三方是极为较罕见的，尽管介绍 OAuth2 的材料中，经常举的例子是“操作系统作为第三方应用向授权服务器申请资源”，但真实应用中极少遇到这样的情况，合理性依然十分有限。</p>
+<p>如果要采用密码模式，那“第三方”属性就必须弱化，把“第三方”视作是系统中与授权服务器相对独立的子模块，在物理上独立于授权服务器部署，但是在逻辑上与授权服务器仍同属一个系统，这样将认证和授权一并完成的密码模式才会有合理的应用场景。</p>
+<p><img src="/zclvct.io/media/17369093589979/17369205926376.jpg"></p>
+<h3 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h3><p> 客户端模式是指第三方应用（行文一致考虑，还是继续沿用这个称呼）以自己的名义，向授权服务器申请资源许可。此模式通常用于管理操作或者自动处理类型的场景中。</p>
+<p> <img src="/zclvct.io/media/17369093589979/17369207278512.jpg"></p>
+<p>微服务架构并不提倡同一个系统的各服务间有默认的信任关系，所以服务之间调用也需要先进行认证授权，然后才能通信。此时，客户端模式便是一种常用的服务间认证授权的解决方案。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>授权（ Authorization）</p><p><a href="https://gitee.com/zclvct/zcct-blog.git/2024/09/01/分布式/架构安全性/授权/">https://gitee.com/zclvct/zcct-blog.git/2024/09/01/分布式/架构安全性/授权/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>zcct</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2024-09-01</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-05-16</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/zclvct/zcct-blog.git/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/">架构安全性</a></div><!--!--></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/zclvct/zcct-blog.git/img/zfb.jpg" alt="支付宝"></span></a><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/zclvct/zcct-blog.git/img/wx.jpg" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/zclvct/zcct-blog.git/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E5%87%AD%E8%AF%81/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">凭证（Credentials）</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/zclvct/zcct-blog.git/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E8%AE%A4%E8%AF%81/"><span class="level-item">认证（Authentication）</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/zclvct/zcct-blog.git/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/zclvct/zcct-blog.git/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/zclvct/zcct-blog.git/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/zclvct/zcct-blog.git/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/GeoHash/">GeoHash</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/PubSub%20%E6%B6%88%E6%81%AF%E5%A4%9A%E6%92%AD%20(%E7%BC%BA%E7%82%B9%E5%A4%9A%E4%B8%8D%E8%A2%AB%E4%BD%BF%E7%94%A8)/">PubSub 消息多播</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/Scan%E6%8C%87%E4%BB%A4/">Scan指令</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/Stream/">Stream</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/zclvct/zcct-blog.git/"><img src="/zclvct/zcct-blog.git/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/zclvct/zcct-blog.git/js/column.js"></script><script src="/zclvct/zcct-blog.git/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/zclvct/zcct-blog.git/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/zclvct/zcct-blog.git/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/zclvct/zcct-blog.git/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/zclvct/zcct-blog.git/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/zclvct/zcct-blog.git/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>GC中基本概念 - ZCCT</title><link rel="manifest" href="/zclvct/zcct-blog.git/manifest.json"><meta name="application-name" content="ZCCT"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ZCCT"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="[TOC] 根节点枚举      迄今为止，所有收集器在根节点枚举这一步骤时都是必须暂停用户线程的，现在可达性分析算法耗时最长的查找引用链的过程已经可以做到与用户线程一起并发，但根节点枚举始终还是必须在一个能保障一致性的快照中才得以进行——这里“一致性”的意思是整个枚举期间执行子系统看起来就像被冻结在某个时间点上，不会出现分析过程中，根节点集合的对象引用关系还在不断变化的情况，若这点不能满足的话，"><meta property="og:type" content="blog"><meta property="og:title" content="GC中基本概念"><meta property="og:url" content="https://gitee.com/zclvct/zcct-blog.git/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/GC%E4%B8%AD%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"><meta property="og:site_name" content="ZCCT"><meta property="og:description" content="[TOC] 根节点枚举      迄今为止，所有收集器在根节点枚举这一步骤时都是必须暂停用户线程的，现在可达性分析算法耗时最长的查找引用链的过程已经可以做到与用户线程一起并发，但根节点枚举始终还是必须在一个能保障一致性的快照中才得以进行——这里“一致性”的意思是整个枚举期间执行子系统看起来就像被冻结在某个时间点上，不会出现分析过程中，根节点集合的对象引用关系还在不断变化的情况，若这点不能满足的话，"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://gitee.com/zclvct.io/media/17307908497054/17307963120093.jpg"><meta property="article:published_time" content="2024-09-01T04:00:00.000Z"><meta property="article:modified_time" content="2025-05-16T03:12:50.729Z"><meta property="article:author" content="zcct"><meta property="article:tag" content="垃圾回收"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://gitee.com/zclvct.io/media/17307908497054/17307963120093.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://gitee.com/zclvct/zcct-blog.git/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/GC%E4%B8%AD%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"},"headline":"GC中基本概念","image":["https://gitee.com/zclvct.io/media/17307908497054/17307963120093.jpg"],"datePublished":"2024-09-01T04:00:00.000Z","dateModified":"2025-05-16T03:12:50.729Z","author":{"@type":"Person","name":"zcct"},"publisher":{"@type":"Organization","name":"ZCCT","logo":{"@type":"ImageObject","url":"https://gitee.com/img/logo.svg"}},"description":"[TOC] 根节点枚举      迄今为止，所有收集器在根节点枚举这一步骤时都是必须暂停用户线程的，现在可达性分析算法耗时最长的查找引用链的过程已经可以做到与用户线程一起并发，但根节点枚举始终还是必须在一个能保障一致性的快照中才得以进行——这里“一致性”的意思是整个枚举期间执行子系统看起来就像被冻结在某个时间点上，不会出现分析过程中，根节点集合的对象引用关系还在不断变化的情况，若这点不能满足的话，"}</script><link rel="canonical" href="https://gitee.com/zclvct/zcct-blog.git/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/GC%E4%B8%AD%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/"><link rel="icon" href="/zclvct/zcct-blog.git/img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/zclvct/zcct-blog.git/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/zclvct/zcct-blog.git/"><img src="/zclvct/zcct-blog.git/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/zclvct/zcct-blog.git/">主页</a><a class="navbar-item" href="/zclvct/zcct-blog.git/archives">档案</a><a class="navbar-item" href="/zclvct/zcct-blog.git/categories">分类</a><a class="navbar-item" href="/zclvct/zcct-blog.git/tags">标签</a><a class="navbar-item" href="/zclvct/zcct-blog.git/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:50.729Z" title="2025/5/16 11:12:50">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/zclvct/zcct-blog.git/categories/java/">java</a></span><span class="level-item">17 分钟读完 (大约2518个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">GC中基本概念</h1><div class="content"><p>[TOC]</p>
+<h2 id="根节点枚举"><a href="#根节点枚举" class="headerlink" title="根节点枚举"></a>根节点枚举</h2><br/>
+    
+<p>迄今为止，所有收集器在根节点枚举这一步骤时都是必须暂停用户线程的，现在可达性分析算法耗时最长的查找引用链的过程已经可以做到与用户线程一起并发，但<strong>根节点枚举始终还是必须在一个能保障一致性的快照中才得以进行</strong>——这里“一致性”的意思是整个枚举期间执行子系统看起来就像被冻结在某个时间点上，不会出现分析过程中，根节点集合的对象引用关系还在不断变化的情况，若这点不能满足的话，分析结果准确性也就无法保证。这是导致垃圾收集过程必须停顿所有用户线程的其中一个重要原因，即使是号称停顿时间可控，或者几乎不会发生停顿的CMS、G1、ZGC等收集器，枚举根节点时也是必须要停顿的。</p>
+<p>当用户线程停顿下来之后，其实并不需要一个不漏地检查完所有 执行上下文和全局的引用位置，虚拟机应当是有办法直接得到哪些地方存放着对象引用的。在HotSpot 的解决方案里，是使用一组称为<strong>OopMap（Ordinary Object Pointer Map）</strong> 的数据结构来达到这个目的。一旦类加载动作完成的时候， HotSpot就会把对象内什么偏移量上是什么类型的数据计算出来，在即时编译过程中，也 会在特定的位置记录下栈里和寄存器里哪些位置是引用。这样收集器在扫描时就可以直接得知这些信息了，并不需要真正一个不漏地从方法区等GC Roots开始查找。</p>
+<h3 id="OopMap（Ordinary-Object-Pointer-Map）普通对象指针图"><a href="#OopMap（Ordinary-Object-Pointer-Map）普通对象指针图" class="headerlink" title="OopMap（Ordinary Object Pointer Map）普通对象指针图"></a>OopMap（Ordinary Object Pointer Map）普通对象指针图</h3><p>OopMap是 HotSpot 虚拟机中的一个重要概念，主要用于垃圾回收和异常处理。以下是关于 OopMap 的关键点：</p>
+<ul>
+<li>定义：<br>OopMap 是一个位图，记录了方法执行过程中各个寄存器和栈位置中哪些位置存储了对象引用（OOPs, Ordinary Object Pointers）。</li>
+<li>用途：<ul>
+<li>垃圾回收：在垃圾回收过程中，OopMap 帮助快速定位到所有活动的对象引用，从而确定哪些对象是可达的，哪些可以被回收。</li>
+<li>异常处理：在发生异常时，OopMap 帮助虚拟机快速恢复到异常处理代码的位置，并确保所有对象引用的正确性。</li>
+</ul>
+</li>
+<li>生成时机：<br>OopMap 在方法编译时生成，由 JIT 编译器负责创建。<br>编译器会在方法的关键点（如 safepoint 检查点）生成 OopMap，以便在这些点上进行垃圾回收或异常处理。</li>
+</ul>
+<h2 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h2><br/>
+
+<ul>
+<li>定义：<br>  安全点是JVM可以安全地中断线程而不影响程序正确性的点。</li>
+<li>用途：<ul>
+<li>垃圾回收：在进行垃圾回收时，JVM需要确保所有线程都处于一个稳定状态，以便安全地回收不再使用的对象。</li>
+<li>线程调度：在进行线程调度时，JVM可以利用安全点来暂停或恢复线程。</li>
+<li>动态代码优化：JIT编译器可以在安全点对字节码进行优化。</li>
+</ul>
+</li>
+<li>触发条件：<ul>
+<li>显式调用：通过System.gc()等方法显式请求垃圾回收。</li>
+<li>内存不足：当堆内存不足时，JVM会自动触发垃圾回收。</li>
+<li>定时检查：JVM会定期检查是否需要进行垃圾回收或其他维护操作。</li>
+</ul>
+</li>
+<li>实现机制：<ul>
+<li>轮询：JVM在每个安全点位置插入轮询代码，检查是否需要暂停线程。</li>
+<li>同步屏障：在多线程环境中，JVM使用同步屏障确保所有线程都能到达安全点。</li>
+</ul>
+</li>
+<li>性能影响：<ul>
+<li>暂停时间：频繁的垃圾回收会导致“停顿”（Stop-The-World），影响应用程序的响应时间。</li>
+<li>优化：现代JVM通过各种优化技术（如增量收集、并发收集等）减少安全点的性能开销。</li>
+</ul>
+</li>
+</ul>
+<br/>    
+
+
+<h2 id="安全区域"><a href="#安全区域" class="headerlink" title="安全区域"></a>安全区域</h2><br/>
+
+<p>安全点机制保证了程序执行时，在不太长的时间内就会遇到可进入垃圾收集 过程的安全点。但是，程序“不执行”的时候呢？所谓的程序不执行就是没有分配处理器时间，典型的 场景便是<strong>用户线程处于Sleep 状态或者Blocked状态，这时候线程无法响应虚拟机的中断请求，不能再走到安全的地方去中断挂起自己</strong>，虚拟机也显然不可能持续等待线程重新被激活分配处理器时间。对于这种情况，就必须引入安全区域（Safe Region）来解决。    </p>
+<ul>
+<li><p>定义：</p>
+<p>  安全区域是指能够确保在某一段代码片段之中，引用关系不会发生变化，因此，在这个区域中任意地方开始垃圾收集都是安全的。我们也可以把安全区域看作被扩展拉伸了的安全点。</p>
+</li>
+</ul>
+<p>当用户线程执行到安全区域里面的代码时，首先会标识自己已经进入了安全区域，那样当这段时间里虚拟机要发起垃圾收集时就不必去管这些已声明自己在安全区域内的线程了。当线程要离开安全区域时，它要检查虚拟机是否已经完成了根节点枚举（或者垃圾收集过程中其他需要暂停用户线程的阶段），如果完成了，那线程就当作没事发生过，继续执行；否则它就必须一直等待，直到收到可以离开安全区域的信号为止。</p>
+<br/>    
+
+
+<h2 id="记忆集与卡表"><a href="#记忆集与卡表" class="headerlink" title="记忆集与卡表"></a>记忆集与卡表</h2><br/>   
+
+<ul>
+<li>定义</li>
+</ul>
+<p>记忆集是一种用于记录<strong>从非收集区域指向收集区域的指针集合</strong>的抽象数据结构。</p>
+<ul>
+<li><p>卡精度：每个记录精确到一块内存区域，该区域内有对象含有跨代指针。 </p>
+<p>  “卡精度”所指的是用一种称为“卡表”（Card Table）的方式去实现记忆集[1]，这也是目前最常用的一种记忆集实现形式。</p>
+<p>  记忆集其实是一种“抽象”的数据结构，抽象的意思是只定义了记忆集的行为意图，并没有定义其行为的具体实现。卡表就是记忆集的一种具体实现，它定义了记忆集的记录精度、与堆内存的映射关系等。</p>
+</li>
+</ul>
+<p>字节数组CARD_TABLE的每一个元素都对应着其标识的内存区域中一块特定大小的内存块，这个 内存块被称作“卡页”（Card Page）。一般来说，卡页大小都是以2的N次幂的字节数，通过上面代码可 以看出HotSp ot中使用的卡页是2的9次幂，即512字节（地址右移9位，相当于用地址除以512）。那如果卡表标识内存区域的起始地址是0x0000的话，数组CARD_TABLE的第0、1、2号元素，分别对应了 地址范围为0x0000～0x01FF、0x0200～0x03FF、0x0400～0x05FF的卡页内存块[4]</p>
+<p><img src="/zclvct.io/media/17307908497054/17307963120093.jpg"></p>
+<p>一个卡页的内存中通常包含不止一个对象，<strong>只要卡页内有一个（或更多）对象的字段存在着跨代指针，那就将对应卡表的数组元素的值标识为1，称为这个元素变脏（Dirty ），没有则标识为0</strong>。<strong>在垃圾收集发生时，只要筛选出卡表中变脏的元素，就能轻易得出哪些卡页内存块中包含跨代指针，把它们加入GC Roots中一并扫描。</strong></p>
+<br/>    
+
+
+<h2 id="写屏障"><a href="#写屏障" class="headerlink" title="写屏障"></a>写屏障</h2><br/> 
+
+<p>写屏障可以看作在虚拟机层面对*<em>引用类型字段赋值</em>这个动作的AOP切面，在引用对象赋值时会产生一个环形（Around）通知，供程序执行额外的动作，也就是说赋值的 前后都在写屏障的覆盖范畴内。在赋值前的部分的写屏障叫作写前屏障（Pre-Write Barrier），在赋值后的则叫作写后屏障（Post-Write Barrier)。</p>
+<ul>
+<li>定义<br>写屏障是一种在对象引用发生变化时插入的额外代码，用于通知垃圾回收器对象引用的更改。通过写屏障，垃圾回收器可以及时更新其内部的数据结构，确保在垃圾回收过程中能够准确地识别出所有可达对象。</li>
+<li>作用<ul>
+<li>增量更新：在对象引用发生变化时，立即更新相关数据结构，避免在垃圾回收时进行全量扫描。</li>
+<li>并发标记：支持并发垃圾回收，允许多个线程同时运行应用程序和垃圾回收器，提高整体性能。</li>
+</ul>
+</li>
+<li>实现方式<ul>
+<li>预写屏障（Pre-Write Barrier）：在写操作之前插入的屏障，通常用于记录对象引用的变化。</li>
+<li>后写屏障（Post-Write Barrier）：在写操作之后插入的屏障，用于更新相关数据结构。</li>
+</ul>
+</li>
+</ul>
+</div><div class="article-licensing box"><div class="licensing-title"><p>GC中基本概念</p><p><a href="https://gitee.com/zclvct/zcct-blog.git/2024/09/01/java/垃圾回收/GC中基本概念/">https://gitee.com/zclvct/zcct-blog.git/2024/09/01/java/垃圾回收/GC中基本概念/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>zcct</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2024-09-01</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-05-16</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/zclvct/zcct-blog.git/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">垃圾回收</a></div><!--!--></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/zclvct/zcct-blog.git/img/zfb.jpg" alt="支付宝"></span></a><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/zclvct/zcct-blog.git/img/wx.jpg" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/zclvct/zcct-blog.git/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/7%E7%A7%8D%E7%BB%8F%E5%85%B8%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">7种经典垃圾收集器</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/zclvct/zcct-blog.git/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0/"><span class="level-item">三色标记</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/zclvct/zcct-blog.git/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/zclvct/zcct-blog.git/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/zclvct/zcct-blog.git/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/zclvct/zcct-blog.git/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/GeoHash/">GeoHash</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/PubSub%20%E6%B6%88%E6%81%AF%E5%A4%9A%E6%92%AD%20(%E7%BC%BA%E7%82%B9%E5%A4%9A%E4%B8%8D%E8%A2%AB%E4%BD%BF%E7%94%A8)/">PubSub 消息多播</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/Scan%E6%8C%87%E4%BB%A4/">Scan指令</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/zclvct/zcct-blog.git/2024/09/01/redis/Stream/">Stream</a></p><p class="categories"><a href="/zclvct/zcct-blog.git/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/zclvct/zcct-blog.git/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/zclvct/zcct-blog.git/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/zclvct/zcct-blog.git/"><img src="/zclvct/zcct-blog.git/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/zclvct/zcct-blog.git/js/column.js"></script><script src="/zclvct/zcct-blog.git/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/zclvct/zcct-blog.git/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/zclvct/zcct-blog.git/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/zclvct/zcct-blog.git/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/zclvct/zcct-blog.git/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/zclvct/zcct-blog.git/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
