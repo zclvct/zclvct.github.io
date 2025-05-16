@@ -293,84 +293,6 @@
 </ol>
 <p>原始快照要破坏的是第二个条件，<strong>当灰色对象要删除指向白色对象的引用关系时，就将这个要删除的引用记录下来</strong>，<strong>在并发扫描结束之后，再将这些记录过的引用关系中的灰色对象为根，重新扫描一次</strong>。这也可以简化理解为，无论引用关系删除与否，都会按照刚刚开始扫描那一刻的对象图快照来进行搜索。</p>
 <p>以上无论是对引用关系记录的插入还是删除，虚拟机的记录操作都是通过写屏障实现的。在 HotSpot虚拟机中，增量更新和原始快照这两种解决方案都有实际应用，譬如，<u>CMS是基于增量更新来做并发标记的，G1、Shenandoah则是用原始快照来实现</u></p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:39.583Z" title="2025/5/16 11:12:39">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">3 分钟读完 (大约393个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95/">可达性分析算法</a></p><div class="content"><br/>
-
-<p>通过一系列称为“GC Roots”的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过 程所走过的路径称为“引用链”（Reference Chain），如果某个对象到GC Roots间没有任何引用链相连， 或者用图论的话来说就是从GC Roots到这个对象不可达时，则证明此对象是不可能再被使用的。<br><br/></p>
-<p><img src="/media/17304386866747/17304388367110.jpg"></p>
-<br/>
-
-<h3 id="在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种："><a href="#在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种：" class="headerlink" title="在Java技术体系里面，固定可作为GC Roots的对象包括以下几种："></a>在Java技术体系里面，固定可作为GC Roots的对象包括以下几种：</h3><br/>
-
-<ol>
-<li>在虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的 参数、局部变量、临时变量等。</li>
-<li>在<strong>方法区中类静态属性</strong>引用的对象，譬如Java类的引用类型静态变量。</li>
-<li>在<strong>方法区中常量</strong>引用的对象，譬如字符串常量池（String Table）里的引用。</li>
-<li>在本地方法栈中JNI（即通常所说的Native方法）引用的对象。</li>
-<li>Java虚拟机内部的引用，如基本数据类型对应的Class对象，一些常驻的异常对象（比如 NullPointExcepiton、OutOfMemoryError）等，还有系统类加载器。</li>
-<li>所有被同步锁（synchronized关键字）持有的对象。</li>
-<li>反映Java虚拟机内部情况的JM XBean、JVM TI中注册的回调、本地代码缓存等。</li>
-</ol>
-<br/>
-
-
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:35.632Z" title="2025/5/16 11:12:35">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约837个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E7%90%86%E8%AE%BA/">分代收集理论</a></p><div class="content"><p>[TOC]</p>
-<br/>
-
-<h2 id="分代假说"><a href="#分代假说" class="headerlink" title="分代假说"></a>分代假说</h2><p>它建立在三个分代假说之上：</p>
-<ol>
-<li>弱分代假说（Weak Generational Hypothesis）：绝大多数对象都是朝生夕灭的。</li>
-<li>强分代假说（Strong Generational Hypothesis）：熬过越多次垃圾收集过程的对象就越难以消亡。</li>
-<li>跨代引用假说（Intergenerational Reference Hypothesis）：跨代引用相对于同代引用来说仅占极少数。</li>
-</ol>
-<br/>
-
-<p>收集器应该将Java堆划分出不同的区域，然后将回收对象依据其年龄（年龄即对象熬过垃圾收集过程的次数）分配到不同的区域之中存储：</p>
-<p>如果一个区域中大多数对象都是朝生夕灭，难以熬过垃圾收集过程的话，那么把它们集中放在一起，每次回收时只<strong>关注如何保留少量存活而不是去标记那些大量将要被回收的对象</strong>，就能以较低代价回收到大量的空间；*—- 弱分代假说*</p>
-<p>如果剩下的都是难以消亡的对象，那把它们集中放在一块， 虚拟机便可以使用较低的频率来回收这个区域，这就同时兼顾了垃圾收集的时间开销和内存的空间有效利用。*—- 强分代假说*</p>
-<p>我们就不应再为了少量的跨代引用去扫描整个老年代，也不必浪费空间专门记录每一个对象是否存在及存在哪些跨代引用，<strong>只需在新生代上建立一个全局的数据结构（该结构被称 为“记忆集”，Remembered Set</strong>），<strong>这个结构把老年代划分成若干小块，标识出老年代的哪一块内存会存在跨代引用</strong>。此后当发生MinorGC时，只有包含了跨代引用的小块内存里的对象才会被加入到GC Roots进行扫描。虽然这种方法需要在对象改变引用关系（如将自己或者某个属性赋值）时维护记录数据的正确性，会增加一些运行时的开销，但比起收集时扫描整个老年代来说仍然是划算的.   <em>—- 跨代引用假说</em></p>
-<h2 id="GC收集名称定义"><a href="#GC收集名称定义" class="headerlink" title="GC收集名称定义"></a>GC收集名称定义</h2><p>部分收集（Partial GC）：指目标不是完整收集整个Java堆的垃圾收集，其中又分为：<br><br/></p>
-<ul>
-<li>新生代收集（Minor GC&#x2F;Young GC）：指目标只是新生代的垃圾收集。</li>
-<li>老年代收集（Major GC&#x2F;Old GC）：指目标只是老年代的垃圾收集。目前只有CMS收集器会有单独收集老年代的行为。另外请注意“Major GC”这个说法现在有点混淆，在不同资料上常有不同所指，读者需按上下文区分到底是指老年代的收集还是整堆收集。</li>
-<li>混合收集（Mixed GC）：指目标是收集整个新生代以及部分老年代的垃圾收集。目前只有G1收集器会有这种行为。</li>
-</ul>
-<br/>
-
-<p>整堆收集（Full GC）：收集整个Java堆和方法区的垃圾收集。</p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:43.660Z" title="2025/5/16 11:12:43">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">5 分钟读完 (大约788个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-%E5%9F%BA%E6%9C%AC%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/">基本垃圾回收算法</a></p><div class="content"><p>[TOC]</p>
-<br/>
-
-<blockquote>
-<p>在对基本回收策略进行描述时，我们假设赋值器运行在一个或者多个线程之上，<br>且只有一个回收器线程，当回收器线程运行时，所有的赋值器线程均处于停止状态。这种<br><strong>万物静止(stop the world)</strong> 的策略大幅简化了回收器的实现。从赋值器线程角度来看，回收过程的执行是原子性的，即赋值器线程感知不到回收器的任何中间状态，回收器也不会受到赋值器线程的任何干扰。</p>
-</blockquote>
-<br/>
-
-<h2 id="标记－清除（mark-sweep"><a href="#标记－清除（mark-sweep" class="headerlink" title="标记－清除（mark-sweep)"></a>标记－清除（mark-sweep)</h2><br/>
-
-<p>回收过程分为两个阶段</p>
-<ul>
-<li>第一阶段为追踪(trace) 阶段，即回收器从根集合（寄存器、线程栈、全局变址）开始遍历对象图，并标记(mark) 所遇到的每个对象；</li>
-<li>第二阶段为清扫 (sweep)阶段，即回收器检查堆中每一个对象，<br>并将所有<strong>未标记的对象</strong>当作垃圾进行回收。</li>
-</ul>
-<p><img src="/media/17304402487913/17306989696842.jpg"></p>
-<p>主要缺点有两个：</p>
-<ul>
-<li>第一个是<strong>执行效率不稳定</strong>，如果Java堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；</li>
-<li>第二个是<strong>内存空间的碎片化问题</strong>，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
-</ul>
-<br/>
-
-<h2 id="标记－复制-mark-copy"><a href="#标记－复制-mark-copy" class="headerlink" title="标记－复制 (mark-copy)"></a>标记－复制 (mark-copy)</h2><br/>
-
-<p>它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
-<p>每次都是针对整个半区进行内存回收，分配内存时也就不用考虑有 间碎片的复杂情况，只要移动堆顶指针，按顺序分配即可。这样实现简单，运行高效。</p>
-<p>这种复制回收算法的代价是将可用内存缩小为了原来的一半，空间浪费太多。标<br><img src="/media/17304402487913/17307003523033.jpg"></p>
-<br/>
-
-<h2 id="标记－整理-mark-compact"><a href="#标记－整理-mark-compact" class="headerlink" title="标记－整理 (mark-compact)"></a>标记－整理 (mark-compact)</h2><br/>
-
-<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法，而后者是移动式的。其中的标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</p>
-<p><img src="/media/17304402487913/17307017755862.jpg"></p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:31.831Z" title="2025/5/16 11:12:31">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">26 分钟读完 (大约3902个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%BD%8E%E5%BB%B6%E8%BF%9F%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/">低延迟垃圾收集器</a></p><div class="content"><p>[TOC]</p>
 <p>下图中浅色阶段表示必须挂起用户线程，深色表示收集器线程与用户线程是并发工作的。</p>
 <p>在CMS和G1之前的全部收集器，其工作的所有步骤都会产生“Stop The World”式的停顿； CMS和G1分别使用增量更新和原始快照技术，实现了标记阶段的并发，不会因管理的堆内存变大，要标记的对象变多而导致停顿时间随之增长。但是对于标记阶段之后的处理，仍未得到妥善解决。<br><strong>CMS使用标记-清除算法，虽然避免了整理阶段收集器带来的停顿，但是清除算法不论如何 化改进，在设计原理上避免不了空间碎片的产生，随着空间碎片不断淤积最终依然逃不过“Stop The World”的命运</strong>。<br><strong>G1虽然可以按更小的粒度进行回收，从而抑制整理阶段出现时间过长的停顿，但毕竟 也还是要暂停的</strong>。</p>
@@ -436,7 +358,85 @@
 <li>并发重分配（Concurrent Relocate）：重分配是ZGC执行过程中的核心阶段，这个过程要把重分 配集中的存活对象复制到新的Region上，并为重分配集中的每个Region维护一个转发表（Forward Table），记录从旧对象到新对象的转向关系。得益于染色指针的支持，ZGC收集器能仅从引用上就明 确得知一个对象是否处于重分配集之中，如果用户线程此时并发访问了位于重分配集中的对象，这次 访问将会被预置的内存屏障所截获，然后立即根据Region上的转发表记录将访问转发到新复制的对象 上，并同时修正更新该引用的值，使其直接指向新对象，ZGC将这种行为称为指针的“自愈”（Self- Healing）能力。这样做的好处是只有第一次访问旧对象会陷入转发，也就是只慢一次，对比 Shenandoah的Brooks转发指针，那是每次对象访问都必须付出的固定开销，简单地说就是每次都慢， 因此ZGC对用户程序的运行时负载要比Shenandoah来得更低一些。还有另外一个直接的好处是由于染 色指针的存在，一旦重分配集中某个Region的存活对象都复制完毕后，这个Region就可以立即释放用于 新对象的分配（但是转发表还得留着不能释放掉），哪怕堆中还有很多指向这个对象的未更新指针也 没有关系，这些旧指针一旦被使用，它们都是可以自愈的。</li>
 <li>并发重映射（Concurrent Remap ）：重映射所做的就是修正整个堆中指向重分配集中旧对象的所 有引用，这一点从目标角度看是与Shenandoah并发引用更新阶段一样的，但是ZGC的并发重映射并不 是一个必须要“迫切”去完成的任务，因为前面说过，即使是旧引用，它也是可以自愈的，最多只是第 一次使用时多一次转发和修正操作。重映射清理这些旧引用的主要目的是为了不变慢（还有清理结束 后可以释放转发表这样的附带收益），所以说这并不是很“迫切”。因此，ZGC很巧妙地把并发重映射 阶段要做的工作，合并到了下一次垃圾收集循环中的并发标记阶段里去完成，反正它们都是要遍历所 有对象的，这样合并就节省了一次遍历对象图[9]的开销。一旦所有指针都被修正之后，原来记录新旧 对象关系的转发表就可以释放掉了。</li>
 </ol>
-</div></article></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/PubSub%20%E6%B6%88%E6%81%AF%E5%A4%9A%E6%92%AD%20(%E7%BC%BA%E7%82%B9%E5%A4%9A%E4%B8%8D%E8%A2%AB%E4%BD%BF%E7%94%A8)/">PubSub 消息多播</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/redis%20%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">redis 分布式锁</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/redis%20list%E5%BA%94%E7%94%A8%E2%80%94%E2%80%94%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">redis list应用——延迟队列</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/codis%20%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88/">codis 集群方案</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:39.583Z" title="2025/5/16 11:12:39">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">3 分钟读完 (大约393个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95/">可达性分析算法</a></p><div class="content"><br/>
+
+<p>通过一系列称为“GC Roots”的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过 程所走过的路径称为“引用链”（Reference Chain），如果某个对象到GC Roots间没有任何引用链相连， 或者用图论的话来说就是从GC Roots到这个对象不可达时，则证明此对象是不可能再被使用的。<br><br/></p>
+<p><img src="/media/17304386866747/17304388367110.jpg"></p>
+<br/>
+
+<h3 id="在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种："><a href="#在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种：" class="headerlink" title="在Java技术体系里面，固定可作为GC Roots的对象包括以下几种："></a>在Java技术体系里面，固定可作为GC Roots的对象包括以下几种：</h3><br/>
+
+<ol>
+<li>在虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的 参数、局部变量、临时变量等。</li>
+<li>在<strong>方法区中类静态属性</strong>引用的对象，譬如Java类的引用类型静态变量。</li>
+<li>在<strong>方法区中常量</strong>引用的对象，譬如字符串常量池（String Table）里的引用。</li>
+<li>在本地方法栈中JNI（即通常所说的Native方法）引用的对象。</li>
+<li>Java虚拟机内部的引用，如基本数据类型对应的Class对象，一些常驻的异常对象（比如 NullPointExcepiton、OutOfMemoryError）等，还有系统类加载器。</li>
+<li>所有被同步锁（synchronized关键字）持有的对象。</li>
+<li>反映Java虚拟机内部情况的JM XBean、JVM TI中注册的回调、本地代码缓存等。</li>
+</ol>
+<br/>
+
+
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:43.660Z" title="2025/5/16 11:12:43">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">5 分钟读完 (大约788个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-%E5%9F%BA%E6%9C%AC%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/">基本垃圾回收算法</a></p><div class="content"><p>[TOC]</p>
+<br/>
+
+<blockquote>
+<p>在对基本回收策略进行描述时，我们假设赋值器运行在一个或者多个线程之上，<br>且只有一个回收器线程，当回收器线程运行时，所有的赋值器线程均处于停止状态。这种<br><strong>万物静止(stop the world)</strong> 的策略大幅简化了回收器的实现。从赋值器线程角度来看，回收过程的执行是原子性的，即赋值器线程感知不到回收器的任何中间状态，回收器也不会受到赋值器线程的任何干扰。</p>
+</blockquote>
+<br/>
+
+<h2 id="标记－清除（mark-sweep"><a href="#标记－清除（mark-sweep" class="headerlink" title="标记－清除（mark-sweep)"></a>标记－清除（mark-sweep)</h2><br/>
+
+<p>回收过程分为两个阶段</p>
+<ul>
+<li>第一阶段为追踪(trace) 阶段，即回收器从根集合（寄存器、线程栈、全局变址）开始遍历对象图，并标记(mark) 所遇到的每个对象；</li>
+<li>第二阶段为清扫 (sweep)阶段，即回收器检查堆中每一个对象，<br>并将所有<strong>未标记的对象</strong>当作垃圾进行回收。</li>
+</ul>
+<p><img src="/media/17304402487913/17306989696842.jpg"></p>
+<p>主要缺点有两个：</p>
+<ul>
+<li>第一个是<strong>执行效率不稳定</strong>，如果Java堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；</li>
+<li>第二个是<strong>内存空间的碎片化问题</strong>，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
+</ul>
+<br/>
+
+<h2 id="标记－复制-mark-copy"><a href="#标记－复制-mark-copy" class="headerlink" title="标记－复制 (mark-copy)"></a>标记－复制 (mark-copy)</h2><br/>
+
+<p>它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
+<p>每次都是针对整个半区进行内存回收，分配内存时也就不用考虑有 间碎片的复杂情况，只要移动堆顶指针，按顺序分配即可。这样实现简单，运行高效。</p>
+<p>这种复制回收算法的代价是将可用内存缩小为了原来的一半，空间浪费太多。标<br><img src="/media/17304402487913/17307003523033.jpg"></p>
+<br/>
+
+<h2 id="标记－整理-mark-compact"><a href="#标记－整理-mark-compact" class="headerlink" title="标记－整理 (mark-compact)"></a>标记－整理 (mark-compact)</h2><br/>
+
+<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法，而后者是移动式的。其中的标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</p>
+<p><img src="/media/17304402487913/17307017755862.jpg"></p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:35.632Z" title="2025/5/16 11:12:35">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约837个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E7%90%86%E8%AE%BA/">分代收集理论</a></p><div class="content"><p>[TOC]</p>
+<br/>
+
+<h2 id="分代假说"><a href="#分代假说" class="headerlink" title="分代假说"></a>分代假说</h2><p>它建立在三个分代假说之上：</p>
+<ol>
+<li>弱分代假说（Weak Generational Hypothesis）：绝大多数对象都是朝生夕灭的。</li>
+<li>强分代假说（Strong Generational Hypothesis）：熬过越多次垃圾收集过程的对象就越难以消亡。</li>
+<li>跨代引用假说（Intergenerational Reference Hypothesis）：跨代引用相对于同代引用来说仅占极少数。</li>
+</ol>
+<br/>
+
+<p>收集器应该将Java堆划分出不同的区域，然后将回收对象依据其年龄（年龄即对象熬过垃圾收集过程的次数）分配到不同的区域之中存储：</p>
+<p>如果一个区域中大多数对象都是朝生夕灭，难以熬过垃圾收集过程的话，那么把它们集中放在一起，每次回收时只<strong>关注如何保留少量存活而不是去标记那些大量将要被回收的对象</strong>，就能以较低代价回收到大量的空间；*—- 弱分代假说*</p>
+<p>如果剩下的都是难以消亡的对象，那把它们集中放在一块， 虚拟机便可以使用较低的频率来回收这个区域，这就同时兼顾了垃圾收集的时间开销和内存的空间有效利用。*—- 强分代假说*</p>
+<p>我们就不应再为了少量的跨代引用去扫描整个老年代，也不必浪费空间专门记录每一个对象是否存在及存在哪些跨代引用，<strong>只需在新生代上建立一个全局的数据结构（该结构被称 为“记忆集”，Remembered Set</strong>），<strong>这个结构把老年代划分成若干小块，标识出老年代的哪一块内存会存在跨代引用</strong>。此后当发生MinorGC时，只有包含了跨代引用的小块内存里的对象才会被加入到GC Roots进行扫描。虽然这种方法需要在对象改变引用关系（如将自己或者某个属性赋值）时维护记录数据的正确性，会增加一些运行时的开销，但比起收集时扫描整个老年代来说仍然是划算的.   <em>—- 跨代引用假说</em></p>
+<h2 id="GC收集名称定义"><a href="#GC收集名称定义" class="headerlink" title="GC收集名称定义"></a>GC收集名称定义</h2><p>部分收集（Partial GC）：指目标不是完整收集整个Java堆的垃圾收集，其中又分为：<br><br/></p>
+<ul>
+<li>新生代收集（Minor GC&#x2F;Young GC）：指目标只是新生代的垃圾收集。</li>
+<li>老年代收集（Major GC&#x2F;Old GC）：指目标只是老年代的垃圾收集。目前只有CMS收集器会有单独收集老年代的行为。另外请注意“Major GC”这个说法现在有点混淆，在不同资料上常有不同所指，读者需按上下文区分到底是指老年代的收集还是整堆收集。</li>
+<li>混合收集（Mixed GC）：指目标是收集整个新生代以及部分老年代的垃圾收集。目前只有G1收集器会有这种行为。</li>
+</ul>
+<br/>
+
+<p>整堆收集（Full GC）：收集整个Java堆和方法区的垃圾收集。</p>
+</div></article></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">64</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">12</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/HyperLogLog/">HyperLogLog</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/Scan%E6%8C%87%E4%BB%A4/">Scan指令</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/GeoHash/">GeoHash</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/Stream/">Stream</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2024-09-01T04:00:00.000Z">2024-09-01</time></p><p class="title"><a href="/2024/09/01/redis/PubSub%20%E6%B6%88%E6%81%AF%E5%A4%9A%E6%92%AD%20(%E7%BC%BA%E7%82%B9%E5%A4%9A%E4%B8%8D%E8%A2%AB%E4%BD%BF%E7%94%A8)/">PubSub 消息多播</a></p><p class="categories"><a href="/categories/redis/">redis</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">16</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
             article: {
                 highlight: {
                     clipboard: true,
