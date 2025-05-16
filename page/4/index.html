@@ -29,82 +29,31 @@
       switchTab();
       window.addEventListener('hashchange', switchTab, false);
   })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:14:28.180Z" title="2025/5/16 11:14:28">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/mysql/">mysql</a></span><span class="level-item">22 分钟读完 (大约3321个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/mysql/%E7%B4%A2%E5%BC%95/%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/">慢查询分析</a></p><div class="content"><p>[TOC]</p>
-<p>对于MySQL，最简单的衡量查询开销的三个指标如下：</p>
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:14:11.284Z" title="2025/5/16 11:14:11">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">13 分钟读完 (大约1947个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/jvm/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84/">运行时栈帧结构</a></p><div class="content"><p>[TOC]</p>
+<p>方法是Java虚拟机最基本的执行单元，“栈帧”（Stack Frame）则是用于支持虚拟机进行方法调用和方法执行的数据结构，它也是虚拟机运行时数据区中的虚拟机栈（Virtual M achine Stack）的栈元素。<strong>栈帧存储了方法的局部变量表、操作数栈、动态连接和方法返回地址等信息</strong>， 每一个方法从调用开始至执行结束的过程，都对应着一个栈帧在虚拟机栈里面从入栈到出栈的过程。</p>
+<p><img src="/media/17328477902466/17328480911148.jpg"></p>
+<h2 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h2><p>局部变量表（Local Variables Table）是一组变量值的存储空间，用于存放方法参数和方法内部定义 的局部变量。</p>
+<p><strong>局部变量表的容量以变量槽（Variable Slot）为最小单位</strong>，《Java虚拟机规范》中并没有明确指出一个变量槽应占用的内存空间大小，只是很有导向性地说到每个变量槽都应该能存放一个boolean、 byte、char、short、int、float、reference或returnAddress类型的数据。</p>
+<p>一个变量槽可以存放一个 2位以内的数据类型，Java中占用不超过32位存储空间的数据类型有boolean、by te、char、short、int、 float、reference和returnAddress这8种类型。</p>
+<blockquote>
 <ul>
-<li><p>响应时间：服务时间和排队时间之和。服务时间是指数据库处理这个查询真正花了多长时间。排队时间是指服务器因为等待某些资源而没有真正执行查询的时间——可能是等I&#x2F;O操作完成，也可能是等待行锁。</p>
-</li>
-<li><p>扫描的行数：一条查询，如果性能很差，最常见的原因是访问的数据太多。大部分性能低下的查询都可以通过减少访问的数据量的方式进行优化。有时候也可能是访问了太多的列；（每次看到SELECT*的时候都需要用怀疑的眼光审视，是不是真的需要返回全部的列，很可能不是必需的。取出全部列，会让优化器无法完成索引覆盖扫描这类优化，还会为服务器带来额外的I&#x2F;O、内存和CPU的消耗）</p>
-</li>
-<li><p>返回的行数：会给服务器带来额外的I&#x2F;O、内存和CPU的消耗（使用limit限制返回行数）</p>
-</li>
+<li>reference类型表示对一个对象实例的引用，《Java虚拟机规范》既没有说明它的长度，也没有明确指出这种引用应有怎样的结构。但是一般来说，虚拟机实现至少都应当能通过这个引用做到两件事情，一是从根据引用直接或间接地查找到对象在Java堆中的数据存放的起始地址或索引，二是根据引用直接或间接地查找到对象所属数据类型在方法区中的存储的类型信息，否则将无法实现《Java语言规范》中定义的语法约定。</li>
+<li>returnAddress类型目前已经很少见了，它是为字节码指令jsr、jsr_w和ret服务的，指向了一条字节码指令的地址，某些很古老的Java虚拟机曾经使用这几条指令来实现异常处理时的跳转，但现在也已经全部改为采用异常表来代替了。</li>
 </ul>
-<h1 id="分析示例"><a href="#分析示例" class="headerlink" title="分析示例"></a>分析示例</h1><p>我们看一下示例数据库Sakila中的一个查询案例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from film_actor where film_id = 1 -- film_id列有索引</span><br></pre></td></tr></table></figure>
-
-<p>这个查询将返回10行数据，从EXPLAIN的结果可以看到，MySQL在索引idx_fk_film_id上使用了ref访问类型来执行查询：</p>
-<p><img src="/media/17375929096940/17375929898630.jpg"><br>﻿图片﻿</p>
-<p><img src="/media/17375929096940/17375929964960.jpg"><br>﻿图片﻿</p>
-<p>EXPLAIN的结果还显示MySQL预估需要访问10行数据。换句话说，查询优化器认为这种访问类型可以高效地完成查询。</p>
-<p>如果没有合适的索引会怎样呢？MySQL就不得不使用一种糟糕的访问类型，下面来看看如果删除对应的索引再来运行这个查询会发生什么情况：</p>
-<p><img src="/media/17375929096940/17375930165147.jpg"><br>﻿图片﻿</p>
-<p>访问类型变成了一个全表扫描(ALL)，现在MySQL预估需要扫描5462条记录来完成这个查询。这里的“Using where”表示MySQL将通过WHERE条件来筛选存储引擎返回的记录。</p>
-<p>一般地，MySQL能够使用如下三种方式应用WHERE条件，从好到坏依次为：</p>
-<ul>
-<li><p>在索引中使用WHERE条件来过滤不匹配的记录。这是在存储引擎层完成的。</p>
-</li>
-<li><p>使用索引覆盖扫描（在Extra列中出现了Using index）来返回记录，直接从索引中过滤不需要的记录并返回命中的结果。这是在MySQL服务器层完成的，但无须再回表查询记录。</p>
-<p>  举例说明一下：索引列a，b，c，查询条件时 a &#x3D; xx and c &#x3D; xx</p>
-</li>
-<li><p>从数据表中返回数据，然后过滤不满足条件的记录（在Extra列中出现Using where）。这在MySQL服务器层完成，MySQL需要先从数据表中读出记录然后过滤。</p>
-</li>
-</ul>
-<h1 id="三星索引"><a href="#三星索引" class="headerlink" title="三星索引"></a>三星索引</h1><p>“三星系统”(three-star system)评价体系，用以判断一个索引是不是适合某个查询语句：</p>
-<p>索引将相关的记录放到一起则获得“一星”；</p>
-<p>如果索引中的数据顺序和查找中的排列顺序一致则获得“二星”；</p>
-<p>如果索引中的列包含了查询中需要的全部列则获得“三星”。</p>
-<h1 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h1><p>聚簇索引并不是一种单独的索引类型，而是一种数据存储方式，术语“聚簇”表示数据行和相邻的键值紧凑地存储在一起。InnoDB的聚簇索引实际上保存了B-tree索引和数据行（聚簇索引的每一个叶子节点都包含了主键值、事务ID、用于事务和MVCC的回滚指针，以及所有的剩余列）。当表有聚簇索引时，它的数据行实际上存放在索引的叶子页(leaf page)中。一个表只能有一个聚簇索引，叶子页包含了一条记录的全部数据。 </p>
-<p>InnoDB根据主键聚簇数据。如果你没有定义主键，InnoDB会选择一个唯一的非空索引代替。如果没有这样的索引，InnoDB会隐式定义一个主键来作为聚簇索引。聚集的数据有一些重要的优点：</p>
-<p>可以把相互关联的数据保存在一起，数据访问更快。聚簇索引将索引和数据保存在同一个B-tree中，因此从聚簇索引中获取数据通常比在非聚簇索引中查找要快。</p>
-<p>同时，聚簇索引也有一些缺点：</p>
-<p>插入速度严重依赖于插入顺序。按照主键的顺序插入行是将数据加载到InnoDB表中最快的方式。但如果不是按照主键的顺序加载数据，那么在加载完成后最好使用OPTIMIZE TABLE命令重新组织一下表。</p>
-<p>更新聚簇索引列的代价很高，因为它会强制InnoDB将每个被更新的行移动到新的位置。</p>
-<p>基于聚簇索引的表在插入新行，或者主键被更新导致需要移动行的时候，可能面临页分裂(page split)的问题。当行的主键值要求必须将这一行插入某个已满的页中时，存储引擎会将该页分裂成两个页面来容纳该行，这就是一次页分裂操作。页分裂会导致表占用更多的磁盘空间。</p>
-<h1 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h1><p>如果一个索引包含（或者说覆盖）所有需要查询的字段的值，我们就称之为覆盖索引。覆盖索引是非常有用的工具，能够极大地提高性能。试想一下，如果查询只需要扫描索引而无须回表，会带来多少好处：</p>
-<p>索引条目通常远小于数据行大小，所以如果只需要读取索引，那么MySQL就会极大地减少数据访问量。</p>
-<p>因为索引是按照列值的顺序存储的（至少在单页内如此），所以对于I&#x2F;O密集型的范围查询会比随机从磁盘读取每一行数据的I&#x2F;O要少得多。</p>
-<p>由于InnoDB的聚簇索引的特点，覆盖索引对InnoDB表特别有用。InnoDB的二级索引在叶子节点中保存了记录的主键值，所以如果二级索引能够覆盖查询，则可以避免对主键索引的二次查询。（二级索引访问需要两次索引查找，而不是一次，通过二级索引查找行，存储引擎需要找到二级索引的叶子节点，以获得对应的主键值，然后根据这个值去聚簇索引中查找对应的行。）﻿</p>
-<h1 id="索引列顺序（怎么指定索引列顺序）"><a href="#索引列顺序（怎么指定索引列顺序）" class="headerlink" title="索引列顺序（怎么指定索引列顺序）"></a>索引列顺序（怎么指定索引列顺序）</h1><p>不需要考虑排序和分组时，将选择性最高的列放在前面通常是很好的。这时索引的作用只是优化查询语句中的WHERE条件。在这种情况下，按这个原则设计的索引确实能够最快地过滤出需要的行。以下面的查询为例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from payment where staff_id = 123 and customer_id = 456</span><br></pre></td></tr></table></figure>
-<p>是应该创建一个(staff_id、customer_id)索引还是应该颠倒一下顺序？这时，可以通过运行某些查询来确定在这个表中值的分布情况，并确定哪列的选择性更高。先用下面的查询预测一下，看看各个WHERE条件的分支对应的数据基数有多大：</p>
-<p><img src="/media/17375929096940/17375931729461.jpg"></p>
-<p>根据前面的经验法则，应该将索引列customer_id放到前面，因为对应条件值的customer_id数量更小。</p>
-<h1 id="索引最左前缀法则‌"><a href="#索引最左前缀法则‌" class="headerlink" title="索引最左前缀法则‌"></a>索引最左前缀法则‌</h1><p>指在MySQL中使用索引时，查询条件需要从索引的最左边开始，并且不能跳过索引中的列。如果查询条件跳过了索引中的某列，那么索引将失效，后续的列也不会被使用。‌</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from payment where staff_id = 123 -- 索引是customer_id,staff_id，因为漏掉了customer_id，所以走不上索引</span><br><span class="line">排序是否命中索引</span><br></pre></td></tr></table></figure>
-
-<p>无论如何排序都是一个成本很高的操作，所以从性能角度考虑，应尽可能避免排序或者尽可能避免对大量数据进行排序。当不能使用索引生成排序结果的时候，MySQL需要自己进行排序，如果数据量小则在内存中进行，如果数据量大则需要使用磁盘，不过MySQL将这个过程统一称为文件排序(filesort)，即使完全是在内存中排序不需要任何磁盘文件时也是如此。</p>
-<p>只有当索引的顺序和ORDER BY子句的顺序完全一致，并且所有列的排序方向（倒序或正序）都一样时，MySQL才能使用索引来对结果做排序。如果查询需要联接多张表，则只有当ORDER BY子句引用的字段全部在第一个表中时，才能使用索引做排序。ORDER BY子句和查找型查询的限制是一样的：需要满足索引的最左前缀的要求，否则，MySQL需要执行排序操作，而无法利用索引排序。</p>
-<p>有一种特殊情况，如果前导列为常量的时候，ORDER BY子句中的列也可以不满足索引的最左前缀的要求。如果在WHERE子句或者JOIN子句中将这些列指定为了常量，就可以“填补”索引字段的间隙了。</p>
-<p>例如，Sakila示例数据库的表rental在列(rental_date，inventory_id，customer_id)上建有名称为rental_date的索引：</p>
-<p><img src="/media/17375929096940/17375932582567.jpg"></p>
-<h1 id="不需要文件排序"><a href="#不需要文件排序" class="headerlink" title="不需要文件排序"></a>不需要文件排序</h1><p>MySQL可以使用rental_date索引为下面的查询做排序，从EXPLAIN中可以看到没有出现文件排序(filesort)操作：</p>
-<p><img src="/media/17375929096940/17375932708160.jpg"></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date = &#x27;2005-05-25&#x27; order by inventory_id, customer_id -- rental_date是常量，后面的排序列则认为符合最左前缀</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date = &#x27;2005-05-25&#x27; order by inventory_id, customer_id,id -- rental_date是常量，后面的排序列则认为符合最左前缀，虽然索引里面没有显示指定id列，id是隐性的包含在索引中的，所以也无需文件排序</span><br></pre></td></tr></table></figure>
-<p>即使ORDER BY子句不满足索引的最左前缀的要求，也可以用于查询排序，这正是因为索引的第一列被指定为了一个常数。</p>
-<h1 id="需要文件排序"><a href="#需要文件排序" class="headerlink" title="需要文件排序"></a>需要文件排序</h1><ul>
-<li>下面这个查询也没有问题，因为ORDER BY使用的两列就是索引的最左前缀(索引顺序：rental_date，inventory_id，customer_id)：</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date &gt; &#x27;2005-05-25&#x27; order by rental_date, inventory_id -- 符合最左前缀</span><br></pre></td></tr></table></figure>
-
-<p>下面是一些不能使用索引做排序的查询：</p>
-<ul>
-<li>下面这个查询使用了两种不同的排序方向，但是索引中的列都是按正序排序的(索引顺序：rental_date，inventory_id，customer_id)：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date = &#x27;2005-05-25&#x27; order by inventory_id asc,  customer_id desc -- 满足最左前缀，但是排序方向不一样</span><br></pre></td></tr></table></figure></li>
-<li>在下面这个查询的ORDER BY子句中，引用了一个不在索引中的列(索引顺序：rental_date，inventory_id，customer_id)：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date = &#x27;2005-05-25&#x27; order by inventory_id ,staff_id -- staff_id不在索引中</span><br></pre></td></tr></table></figure></li>
-<li>下面这个查询的WHERE和ORDER BY中的列无法组合成索引的最左前缀(索引顺序：rental_date，inventory_id，customer_id)：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date = &#x27;2005-05-25&#x27; order by customer_id -- 不满足最左前缀，漏掉了inventory_id</span><br></pre></td></tr></table></figure></li>
-<li>下面这个查询在索引列的第一列上是范围条件，所以MySQL无法使用索引的其余列(索引顺序：rental_date，inventory_id，customer_id)：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date &gt; &#x27;2005-05-25&#x27; order by  inventory_id -- 第一列如果是范围查询，则认为不符合最左前缀</span><br></pre></td></tr></table></figure></li>
-<li>这个查询在inventory_id列上有多个等于条件。对于排序来说，这也是一种范围查询(索引顺序：rental_date，inventory_id，customer_id)：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rental where rental_date = &#x27;2005-05-25&#x27; and inventory_id in (1,2) order by customer_id -- inventory_id 条件是范围查询，则认为不符合最左前缀</span><br></pre></td></tr></table></figure></li>
-</ul>
+</blockquote>
+<h2 id="操作数栈"><a href="#操作数栈" class="headerlink" title="操作数栈"></a>操作数栈</h2><p>操作数栈（Operand Stack）也常被称为操作栈，它是一个后入先出（Last In First Out，LIFO）栈。</p>
+<p>当一个方法刚刚开始执行的时候，这个方法的操作数栈是空的，在方法的执行过程中，会有各种字节码指令往操作数栈中写入和提取内容，也就是出栈和入栈操作。譬如<strong>在做算术运算的时候是通过将运算涉及的操作数栈压入栈顶后调用运算指令来进行的</strong>，又譬如<strong>在调用其他方法的时候是通过操作数栈来进行方法参数的传递</strong>。</p>
+<p>两个不同栈帧作为不同方法的虚拟机栈的元素，是完全相互独立的。但是在大多虚拟机的实现里都会进行一些优化处理，令两个栈帧出现一部分重叠。让下面栈帧的部分操作数栈与上面栈帧的部分局部变量表重叠在一起，这样做不仅节约了一些空间，更重要的是在进行方法调 用时就可以直接共用一部分数据，无须进行额外的参数复制传递了。</p>
+<p><img src="/media/17328477902466/17328616385625.jpg"></p>
+<h2 id="动态连接"><a href="#动态连接" class="headerlink" title="动态连接"></a>动态连接</h2><p>每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用，持有这个引用是为了支持方法调用过程中的动态连接（Dynamic Linking）。Class文件的常量池中存有大量的符号引用，字节码中的方法调用指令就以常量池里指向方法的符号引用作为参数。这些符号 引用一部分会在类加载阶段或者第一次使用的时候就被转化为直接引用，这种转化被称为静态解析。 另外一部分将在每一次运行期间都转化为直接引用，这部分就称为动态连接。</p>
+<h2 id="方法返回地址"><a href="#方法返回地址" class="headerlink" title="方法返回地址"></a>方法返回地址</h2><p>当一个方法开始执行后，只有两种方式退出这个方法</p>
+<ol>
+<li>执行引擎遇到任意一个方法返回的字节码指令，这时候可能会有返回值传递给上层的方法调用者（调用当前方法的方法称为调用者或者主调方法，方法是否有返回值以及返回值的类型将根据遇到何种方法返回指令来决定，这种退出方法的方式称为“正常调用完成”（Normal Method Invocation Completion）。</li>
+<li>在方法执行的过程中遇到了异常，并且这个异常没有在方法体内得到妥善处理。无论是Java虚拟机内部产生的异常，还是代码中使用athrow字节码指令产生的异常，只要在本方法的异常表中没有搜索到匹配的异常处理器，就会导致方法退出，这种退出方法的方式称为“异常调用完成（Abrupt Method Invocation Completion）”。一个方法使用异常完成出口的方式退出，是不会给它的上层调用者提供任何返回值的。</li>
+</ol>
+<p>无论采用何种退出方式，在方法退出之后，都必须返回到最初方法被调用时的位置，程序才能 续执行，方法返回时可能需要在栈帧中保存一些信息，用来帮助恢复它的上层主调方法的执行状态。 一般来说，方法正常退出时，主调方法的PC计数器的值就可以作为返回地址，栈帧中很可能会保存这个计数器值。而方法异常退出时，返回地址是要通过异常处理器表来确定的，栈帧中就一般不会保存这部分信息。</p>
+<p>方法退出的过程实际上等同于把当前栈帧出栈，因此退出时可能执行的操作有：恢复上层方法的局部变量表和操作数栈，把返回值（如果有的话）压入调用者栈帧的操作数栈中，调整PC计数器的值以指向方法调用指令后面的一条指令等。笔者这里写的“可能”是由于这是基于概念模型的讨论，只有具体到某一款Java虚拟机实现，会执行哪些操作才能确定下来。</p>
+<h1 id="附加信息"><a href="#附加信息" class="headerlink" title="附加信息"></a>附加信息</h1><p>《Java虚拟机规范》允许虚拟机实现增加一些规范里没有描述的信息到栈帧之中，例如与调试、 性能收集相关的信息，这部分信息完全取决于具体的虚拟机实现，这里不再详述。在讨论概念时，一般会把动态连接、方法返回地址与其他附加信息全部归为一类，称为栈帧信息。</p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:50.729Z" title="2025/5/16 11:12:50">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">17 分钟读完 (大约2518个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/GC%E4%B8%AD%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">GC中基本概念</a></p><div class="content"><p>[TOC]</p>
 <h2 id="根节点枚举"><a href="#根节点枚举" class="headerlink" title="根节点枚举"></a>根节点枚举</h2><br/>
     
@@ -194,212 +143,6 @@
 <li>预写屏障（Pre-Write Barrier）：在写操作之前插入的屏障，通常用于记录对象引用的变化。</li>
 <li>后写屏障（Post-Write Barrier）：在写操作之后插入的屏障，用于更新相关数据结构。</li>
 </ul>
-</li>
-</ul>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:39.583Z" title="2025/5/16 11:12:39">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">3 分钟读完 (大约393个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95/">可达性分析算法</a></p><div class="content"><br/>
-
-<p>通过一系列称为“GC Roots”的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过 程所走过的路径称为“引用链”（Reference Chain），如果某个对象到GC Roots间没有任何引用链相连， 或者用图论的话来说就是从GC Roots到这个对象不可达时，则证明此对象是不可能再被使用的。<br><br/></p>
-<p><img src="/media/17304386866747/17304388367110.jpg"></p>
-<br/>
-
-<h3 id="在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种："><a href="#在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种：" class="headerlink" title="在Java技术体系里面，固定可作为GC Roots的对象包括以下几种："></a>在Java技术体系里面，固定可作为GC Roots的对象包括以下几种：</h3><br/>
-
-<ol>
-<li>在虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的 参数、局部变量、临时变量等。</li>
-<li>在<strong>方法区中类静态属性</strong>引用的对象，譬如Java类的引用类型静态变量。</li>
-<li>在<strong>方法区中常量</strong>引用的对象，譬如字符串常量池（String Table）里的引用。</li>
-<li>在本地方法栈中JNI（即通常所说的Native方法）引用的对象。</li>
-<li>Java虚拟机内部的引用，如基本数据类型对应的Class对象，一些常驻的异常对象（比如 NullPointExcepiton、OutOfMemoryError）等，还有系统类加载器。</li>
-<li>所有被同步锁（synchronized关键字）持有的对象。</li>
-<li>反映Java虚拟机内部情况的JM XBean、JVM TI中注册的回调、本地代码缓存等。</li>
-</ol>
-<br/>
-
-
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:31.831Z" title="2025/5/16 11:12:31">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">26 分钟读完 (大约3902个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%BD%8E%E5%BB%B6%E8%BF%9F%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/">低延迟垃圾收集器</a></p><div class="content"><p>[TOC]</p>
-<p>下图中浅色阶段表示必须挂起用户线程，深色表示收集器线程与用户线程是并发工作的。</p>
-<p>在CMS和G1之前的全部收集器，其工作的所有步骤都会产生“Stop The World”式的停顿； CMS和G1分别使用增量更新和原始快照技术，实现了标记阶段的并发，不会因管理的堆内存变大，要标记的对象变多而导致停顿时间随之增长。但是对于标记阶段之后的处理，仍未得到妥善解决。<br><strong>CMS使用标记-清除算法，虽然避免了整理阶段收集器带来的停顿，但是清除算法不论如何 化改进，在设计原理上避免不了空间碎片的产生，随着空间碎片不断淤积最终依然逃不过“Stop The World”的命运</strong>。<br><strong>G1虽然可以按更小的粒度进行回收，从而抑制整理阶段出现时间过长的停顿，但毕竟 也还是要暂停的</strong>。</p>
-<p><img src="/media/17321588916542/17321596868873.jpg"></p>
-<h1 id="Shenandoah-谢南多亚-收集器"><a href="#Shenandoah-谢南多亚-收集器" class="headerlink" title="Shenandoah(谢南多亚)收集器"></a>Shenandoah(谢南多亚)收集器</h1><p>Shenandoah也是使用基于Region的堆内存布局，同样 有着用于存放大对象的Humongous Region，默认的回收策略也同样是优先处理回收价值最大的 Region……但在管理堆内存方面，它与G1至少有三个明显的不同之处.</p>
-<ol>
-<li>支持并发的整理算法,G1的回收阶段是可以多线程并行的，但却不能与用户线程并发.</li>
-<li>Shenandoah（目前）是默认不使用分代收集的，换言之，不会有 专门的新生代Region或者老年代Region的存在，没有实现分代，并不是说分代对Shenandoah没有价值， 这更多是出于性价比的权衡，基于工作量上的考虑而将其放到优先级较低的位置上.</li>
-<li>Shenandoah摒弃了在G1中耗费大量内存和计算资源去维护的记忆集，改用名为“连接矩阵”（Connection Matrix）的全局数据结构来记录跨Region的引用关系，降低了处理跨代指针时的记忆集维护消耗，也降低了伪共享问题的发生概率.</li>
-</ol>
-<p><img src="/media/17321588916542/17321668602765.jpg"></p>
-<ul>
-<li><p>初始标记（Initial Marking）：</p>
-<p>  与G1一样，首先标记与GC Roots直接关联的对象，这个阶段仍是“Stop The World”的，但停顿时间与堆大小无关，只与GC Roots的数量相关。</p>
-</li>
-<li><p>并发标记（Concurrent Marking）：</p>
-<p>  与G1一样，遍历对象图，标记出全部可达的对象，这个阶段是与用户线程一起并发的，时间长短取决于堆中存活对象的数量以及对象图的结构复杂程度。</p>
-</li>
-<li><p>最终标记（Final M arking）：</p>
-<p>  与G1一样，处理剩余的SATB扫描，并在这个阶段统计出回收价值 最高的Region，将这些Region构成一组回收集（Collection Set）。最终标记阶段也会有一小段短暂的停顿。</p>
-</li>
-<li><p>并发清理（Concurrent Cleanup ）：</p>
-<p>  这个阶段用于清理那些整个区域内连一个存活对象都没有找到的Region（这类Region被称为Immediate Garbage Region)。</p>
-</li>
-<li><p>并发回收（Concurrent Evacuation）：</p>
-<p>  并发回收阶段是Shenandoah与之前HotSpot中其他收集器的核心差异。在这个阶段，Shenandoah要把回收集里面的存活对象先复制一份到其他未被使用的Region之中。复制对象这件事情如果将用户线程冻结起来再做那是相当简单的，但如果两者必须要同时并发进行的话，就变得复杂起来了。其困难点是在移动对象的同时，用户线程仍然可能不停对被移动的对象 进行读写访问，移动对象是一次性的行为，但移动之后整个内存中所有指向该对象的引用都还是旧对象的地址，这是很难一瞬间全部改变过来的。对于并发回收阶段遇到的这些困难，Shenandoah将会通过读屏障和被称为“Brooks Pointers”的转发指针来解决。并发回收阶段运行的时间长短取决于回收集的大小。</p>
-</li>
-<li><p>初始引用更新（Initial Update Reference）：</p>
-<p>  并发回收阶段复制对象结束后，还需要把堆中所有指向旧对象的引用修正到复制后的新地址，这个操作称为引用更新。引用更新的初始化阶段实际上并未做什么具体的处理，设立这个阶段只是为了建立一个线程集合点，确保所有并发回收阶段中进行的收集器线程都已完成分配给它们的对象移动任务而已。初始引用更新时间很短，会产生一个非常短暂的停顿。</p>
-</li>
-<li><p>并发引用更新（Concurrent Update Reference）：</p>
-<p>  真正开始进行引用更新操作，这个阶段是与用户线程一起并发的，时间长短取决于内存中涉及的引用数量的多少。并发引用更新与并发标记不同，它不再需要沿着对象图来搜索，只需要按照内存物理地址的顺序，线性地搜索出引用类型，把旧值改为新值即可。</p>
-</li>
-<li><p>最终引用更新（Final Update Reference）：</p>
-<p>  解决了堆中的引用更新后，还要修正存在于GC Roots 中的引用。这个阶段是Shenandoah的最后一次停顿，停顿时间只与GC Roots的数量相关。</p>
-</li>
-<li><p>并发清理（Concurrent Cleanup ）：</p>
-<p>  经过并发回收和引用更新之后，整个回收集中所有的Region已再无存活对象，这些Region都变成Immediate Garbage Regions了，最后再调用一次并发清理过程来回收 这些Region的内存空间，供以后新对象分配使用。</p>
-</li>
-</ul>
-<p><img src="/media/17321588916542/17321669915068.jpg"></p>
-<p><img src="/media/17321588916542/17321690862577.jpg"></p>
-<h2 id="ZGC收集器"><a href="#ZGC收集器" class="headerlink" title="ZGC收集器"></a>ZGC收集器</h2><p>ZGC和Shenandoah的目标是高度相似的，都希望在尽可能对吞吐量影响不太大的前提下，实现在任意堆内存大小下都可以把垃圾收集的停顿时间限制在十毫秒以内的低延迟。</p>
-<p>ZGC也采用基于Region的堆内存布局，但与它们不同的是，ZGC的Region（在一些官方资料中将它称为Page或者ZPage）具有动态性——动态创建和销毁，以及动态的区域容量大小。在x64硬件平台下，ZGC的 Region可以具有如图3-19所示的大、中、小三类容量：</p>
-<ul>
-<li>小型Region（Small Region）：容量固定为2MB，用于放置小于256KB的小对象。</li>
-<li>中型Region（Medium Region）：容量固定为32MB，用于放置大于等于256KB但小于4M B的对 象。</li>
-<li>大型Region（Large Region）：容量不固定，可以动态变化，但必须为2MB的整数倍，用于放置4M B或以上的大对象。每个大型Region中只会存放一个大对象，这也预示着虽然名字叫作“大型Region”，但它的实际容量完全有可能小于中型Region，最小容量可低至4MB。大型Region在ZGC的实现中是不会被重分配的，因为复制一个大对象的代价非常高昂。</li>
-</ul>
-<p><img src="/media/17321588916542/17321713938602.jpg"></p>
-<p>ZGC收集器有一个标志性的设计是它采用的染色指针技术（Colored Pointer，其他类似的技术中可 能将它称为Tag Pointer或者Version Pointer）<br><img src="/media/17321588916542/17321718622056.jpg"></p>
-<ul>
-<li><p>染色指针可以使得一旦某个Region的存活对象被移走之后，这个Region立即就能够被释放和重用掉，而不必等待整个堆中所有指向该Region的引用都被修正后才能清理。这点相比起Shenandoah是一个颇大的优势，使得理论上只要还有一个空闲Region，ZGC就能完成收集，而Shenandoah需要等到引用 更新阶段结束以后才能释放回收集中的Region，这意味着堆中几乎所有对象都存活的极端情况，需要 1∶1复制对象到新Region的话，就必须要有一半的空闲Region来完成收集。至于为什么染色指针能够导致这样的结果，笔者将在后续解释其“自愈”特性的时候进行解释。</p>
-</li>
-<li><p>染色指针可以大幅减少在垃圾收集过程中内存屏障的使用数量，设置内存屏障，尤其是写屏障的 目的通常是为了记录对象引用的变动情况，如果将这些信息直接维护在指针中，显然就可以省去一些 专门的记录操作。实际上，到目前为止ZGC都并未使用任何写屏障，只使用了读屏障（一部分是染色指针的功劳，一部分是ZGC现在还不支持分代收集，天然就没有跨代引用的问题）。内存屏障对程序 运行时性能的损耗在前面章节中已经讲解过，能够省去一部分的内存屏障，显然对程序运行效率是大 有裨益的，所以ZGC对吞吐量的影响也相对较低。</p>
-</li>
-<li><p>染色指针可以作为一种可扩展的存储结构用来记录更多与对象标记、重定位过程相关的数据，以便日后进一步提高性能。现在Linux下的64位指针还有前18位并未使用，它们虽然不能用来寻址，却可 以通过其他手段用于信息记录。如果开发了这18位，既可以腾出已用的4个标志位，将ZGC可支持的 最大堆内存从4TB拓展到64TB，也可以利用其余位置再存储更多的标志，譬如存储一些追踪信息来让 垃圾收集器在移动对象时能将低频次使用的对象移动到不常访问的内存区域。</p>
-</li>
-</ul>
-<ol>
-<li>并发标记（Concurrent Mark）：与G1、Shenandoah一样，并发标记是遍历对象图做可达性分析的 阶段，前后也要经过类似于G1、Shenandoah的初始标记、最终标记（尽管ZGC中的名字不叫这些）的 短暂停顿，而且这些停顿阶段所做的事情在目标上也是相类似的。与G1、Shenandoah不同的是，ZGC 的标记是在指针上而不是在对象上进行的，标记阶段会更新染色指针中的M arked 0、M arked 1标志 位。</li>
-<li>并发预备重分配（Concurrent Prep are for Relocate）：这个阶段需要根据特定的查询条件统计得出 本次收集过程要清理哪些Region，将这些Region组成重分配集（Relocation Set）。重分配集与G1收集器 的回收集（Collection Set）还是有区别的，ZGC划分Region的目的并非为了像G1那样做收益优先的增量回收。相反，ZGC每次回收都会扫描所有的Region，用范围更大的扫描成本换取省去G1中记忆集的 维护成本。因此，ZGC的重分配集只是决定了里面的存活对象会被重新复制到其他的Region中，里面 的Region会被释放，而并不能说回收行为就只是针对这个集合里面的Region进行，因为标记过程是针对 全堆的。此外，在JDK 12的ZGC中开始支持的类卸载以及弱引用的处理，也是在这个阶段中完成的。</li>
-<li>并发重分配（Concurrent Relocate）：重分配是ZGC执行过程中的核心阶段，这个过程要把重分 配集中的存活对象复制到新的Region上，并为重分配集中的每个Region维护一个转发表（Forward Table），记录从旧对象到新对象的转向关系。得益于染色指针的支持，ZGC收集器能仅从引用上就明 确得知一个对象是否处于重分配集之中，如果用户线程此时并发访问了位于重分配集中的对象，这次 访问将会被预置的内存屏障所截获，然后立即根据Region上的转发表记录将访问转发到新复制的对象 上，并同时修正更新该引用的值，使其直接指向新对象，ZGC将这种行为称为指针的“自愈”（Self- Healing）能力。这样做的好处是只有第一次访问旧对象会陷入转发，也就是只慢一次，对比 Shenandoah的Brooks转发指针，那是每次对象访问都必须付出的固定开销，简单地说就是每次都慢， 因此ZGC对用户程序的运行时负载要比Shenandoah来得更低一些。还有另外一个直接的好处是由于染 色指针的存在，一旦重分配集中某个Region的存活对象都复制完毕后，这个Region就可以立即释放用于 新对象的分配（但是转发表还得留着不能释放掉），哪怕堆中还有很多指向这个对象的未更新指针也 没有关系，这些旧指针一旦被使用，它们都是可以自愈的。</li>
-<li>并发重映射（Concurrent Remap ）：重映射所做的就是修正整个堆中指向重分配集中旧对象的所 有引用，这一点从目标角度看是与Shenandoah并发引用更新阶段一样的，但是ZGC的并发重映射并不 是一个必须要“迫切”去完成的任务，因为前面说过，即使是旧引用，它也是可以自愈的，最多只是第 一次使用时多一次转发和修正操作。重映射清理这些旧引用的主要目的是为了不变慢（还有清理结束 后可以释放转发表这样的附带收益），所以说这并不是很“迫切”。因此，ZGC很巧妙地把并发重映射 阶段要做的工作，合并到了下一次垃圾收集循环中的并发标记阶段里去完成，反正它们都是要遍历所 有对象的，这样合并就节省了一次遍历对象图[9]的开销。一旦所有指针都被修正之后，原来记录新旧 对象关系的转发表就可以释放掉了。</li>
-</ol>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:35.632Z" title="2025/5/16 11:12:35">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约837个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E7%90%86%E8%AE%BA/">分代收集理论</a></p><div class="content"><p>[TOC]</p>
-<br/>
-
-<h2 id="分代假说"><a href="#分代假说" class="headerlink" title="分代假说"></a>分代假说</h2><p>它建立在三个分代假说之上：</p>
-<ol>
-<li>弱分代假说（Weak Generational Hypothesis）：绝大多数对象都是朝生夕灭的。</li>
-<li>强分代假说（Strong Generational Hypothesis）：熬过越多次垃圾收集过程的对象就越难以消亡。</li>
-<li>跨代引用假说（Intergenerational Reference Hypothesis）：跨代引用相对于同代引用来说仅占极少数。</li>
-</ol>
-<br/>
-
-<p>收集器应该将Java堆划分出不同的区域，然后将回收对象依据其年龄（年龄即对象熬过垃圾收集过程的次数）分配到不同的区域之中存储：</p>
-<p>如果一个区域中大多数对象都是朝生夕灭，难以熬过垃圾收集过程的话，那么把它们集中放在一起，每次回收时只<strong>关注如何保留少量存活而不是去标记那些大量将要被回收的对象</strong>，就能以较低代价回收到大量的空间；*—- 弱分代假说*</p>
-<p>如果剩下的都是难以消亡的对象，那把它们集中放在一块， 虚拟机便可以使用较低的频率来回收这个区域，这就同时兼顾了垃圾收集的时间开销和内存的空间有效利用。*—- 强分代假说*</p>
-<p>我们就不应再为了少量的跨代引用去扫描整个老年代，也不必浪费空间专门记录每一个对象是否存在及存在哪些跨代引用，<strong>只需在新生代上建立一个全局的数据结构（该结构被称 为“记忆集”，Remembered Set</strong>），<strong>这个结构把老年代划分成若干小块，标识出老年代的哪一块内存会存在跨代引用</strong>。此后当发生MinorGC时，只有包含了跨代引用的小块内存里的对象才会被加入到GC Roots进行扫描。虽然这种方法需要在对象改变引用关系（如将自己或者某个属性赋值）时维护记录数据的正确性，会增加一些运行时的开销，但比起收集时扫描整个老年代来说仍然是划算的.   <em>—- 跨代引用假说</em></p>
-<h2 id="GC收集名称定义"><a href="#GC收集名称定义" class="headerlink" title="GC收集名称定义"></a>GC收集名称定义</h2><p>部分收集（Partial GC）：指目标不是完整收集整个Java堆的垃圾收集，其中又分为：<br><br/></p>
-<ul>
-<li>新生代收集（Minor GC&#x2F;Young GC）：指目标只是新生代的垃圾收集。</li>
-<li>老年代收集（Major GC&#x2F;Old GC）：指目标只是老年代的垃圾收集。目前只有CMS收集器会有单独收集老年代的行为。另外请注意“Major GC”这个说法现在有点混淆，在不同资料上常有不同所指，读者需按上下文区分到底是指老年代的收集还是整堆收集。</li>
-<li>混合收集（Mixed GC）：指目标是收集整个新生代以及部分老年代的垃圾收集。目前只有G1收集器会有这种行为。</li>
-</ul>
-<br/>
-
-<p>整堆收集（Full GC）：收集整个Java堆和方法区的垃圾收集。</p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:46.862Z" title="2025/5/16 11:12:46">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">8 分钟读完 (大约1274个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0/">三色标记</a></p><div class="content"><p>[TOC]</p>
-<br/>
-
-<p>可达性分析算法理论上要求全过程都基于一个能保障一致性的快照中才能够进行分析， 这意味着必须全程冻结用户线程的运行。在根节点枚举这个步骤中，由于GC Roots相比 起整个Java堆中全部的对象毕竟还算是极少数，且在各种优化技巧（如OopMap ）的加持下，它带来的停顿已经是非常短暂且相对固定（不随堆容量而增长）的了。可<strong>从GC Roots再继续往下遍历对象图，这一步骤的停顿时间就必定会与Java堆容量直接成正比例关系</strong>：<strong>堆越大，存储的对象越多，对象图结构越复杂，要标记更多对象而产生的停顿时间自然就更长。</strong></p>
-<br/>
-
-<h2 id="三色标记"><a href="#三色标记" class="headerlink" title="三色标记"></a>三色标记</h2><p>三色标记（Tri-color Marking）把遍历对象图过程中遇到的对象，按照“是否访问过”这个条件标记成以下三种颜色：<br><br/></p>
-<ul>
-<li><p>白色：表示对象尚未被垃圾收集器访问过。显然在可达性分析刚刚开始的阶段，所有的对象都是白色的，若在分析结束的阶段，仍然是白色的对象，即代表不可达。</p>
-</li>
-<li><p>黑色：表示对象已经被垃圾收集器访问过，且<strong>这个对象的所有引用都已经扫描过</strong>。黑色的对象代表已经扫描过，它是安全存活的，如果有其他对象引用指向了黑色对象，无须重新扫描一遍。黑色对象不可能直接（不经过灰色对象）指向某个白色对象。</p>
-</li>
-<li><p>灰色：表示对象已经被垃圾收集器访问过，但<strong>这个对象上至少存在一个引用还没有被扫描过</strong>。</p>
-</li>
-</ul>
-<p>如果在标记过程中用户线程此时是冻结的，只有收集器线程在工作，那不会有任何问题。但如果用户线程与收集器是并发工作，收集器在对象图上标记颜色，同时用户线程在修改引用 关系——即修改对象图的结构，这样可能出现两种后果：</p>
-<ol>
-<li><strong>多标</strong>：把原本消亡的对象错误标记为存活，这不是好事，但其实是可以容忍的，只不过产生了一点逃过本次收集的浮动垃圾而已，下次收集清理掉就好。</li>
-<li><strong>漏标</strong>：把原本存活的对象错误标记为已消亡，这就是非常致命的后果，程序肯定会因此发生错误。</li>
-</ol>
-<p><img src="/media/17308567619994/17316559737619.jpg"></p>
-<p>Wilson于1994年在理论上证明了，当且仅当以下两个条件同时满足时，会产生“对象消失”的问题，即原本应该是<strong>黑色的对象被误标为白色</strong>：</p>
-<ul>
-<li><p>赋值器插入了一条或多条从黑色对象到白色对象的新引用</p>
-</li>
-<li><p>赋值器删除了全部从灰色对象到该白色对象的直接或间接引用</p>
-</li>
-</ul>
-<p>我们要解决并发扫描时的对象消失问题，只需破坏这两个条件的任意一个即可。由此分别 产生了两种解决方案：增量更新（Incremental Update）和原始快照（Snapshot At The Beginning，SATB）。</p>
-<ol>
-<li>增量更新</li>
-</ol>
-<p>增量更新要破坏的是第一个条件，<strong>当黑色对象插入新的指向白色对象的引用关系时，就将这个新插入的引用记录下来</strong>，<strong>等并发扫描结束之后，再将这些记录过的引用关系中的黑色对象为根，重新扫描一次</strong>。这可以简化理解为，黑色对象一旦新插入了指向白色对象的引用之后，它就变回灰色对象了。</p>
-<ol>
-<li>原始快照</li>
-</ol>
-<p>原始快照要破坏的是第二个条件，<strong>当灰色对象要删除指向白色对象的引用关系时，就将这个要删除的引用记录下来</strong>，<strong>在并发扫描结束之后，再将这些记录过的引用关系中的灰色对象为根，重新扫描一次</strong>。这也可以简化理解为，无论引用关系删除与否，都会按照刚刚开始扫描那一刻的对象图快照来进行搜索。</p>
-<p>以上无论是对引用关系记录的插入还是删除，虚拟机的记录操作都是通过写屏障实现的。在 HotSpot虚拟机中，增量更新和原始快照这两种解决方案都有实际应用，譬如，<u>CMS是基于增量更新来做并发标记的，G1、Shenandoah则是用原始快照来实现</u></p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:43.660Z" title="2025/5/16 11:12:43">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">5 分钟读完 (大约788个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-%E5%9F%BA%E6%9C%AC%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/">基本垃圾回收算法</a></p><div class="content"><p>[TOC]</p>
-<br/>
-
-<blockquote>
-<p>在对基本回收策略进行描述时，我们假设赋值器运行在一个或者多个线程之上，<br>且只有一个回收器线程，当回收器线程运行时，所有的赋值器线程均处于停止状态。这种<br><strong>万物静止(stop the world)</strong> 的策略大幅简化了回收器的实现。从赋值器线程角度来看，回收过程的执行是原子性的，即赋值器线程感知不到回收器的任何中间状态，回收器也不会受到赋值器线程的任何干扰。</p>
-</blockquote>
-<br/>
-
-<h2 id="标记－清除（mark-sweep"><a href="#标记－清除（mark-sweep" class="headerlink" title="标记－清除（mark-sweep)"></a>标记－清除（mark-sweep)</h2><br/>
-
-<p>回收过程分为两个阶段</p>
-<ul>
-<li>第一阶段为追踪(trace) 阶段，即回收器从根集合（寄存器、线程栈、全局变址）开始遍历对象图，并标记(mark) 所遇到的每个对象；</li>
-<li>第二阶段为清扫 (sweep)阶段，即回收器检查堆中每一个对象，<br>并将所有<strong>未标记的对象</strong>当作垃圾进行回收。</li>
-</ul>
-<p><img src="/media/17304402487913/17306989696842.jpg"></p>
-<p>主要缺点有两个：</p>
-<ul>
-<li>第一个是<strong>执行效率不稳定</strong>，如果Java堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；</li>
-<li>第二个是<strong>内存空间的碎片化问题</strong>，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
-</ul>
-<br/>
-
-<h2 id="标记－复制-mark-copy"><a href="#标记－复制-mark-copy" class="headerlink" title="标记－复制 (mark-copy)"></a>标记－复制 (mark-copy)</h2><br/>
-
-<p>它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
-<p>每次都是针对整个半区进行内存回收，分配内存时也就不用考虑有 间碎片的复杂情况，只要移动堆顶指针，按顺序分配即可。这样实现简单，运行高效。</p>
-<p>这种复制回收算法的代价是将可用内存缩小为了原来的一半，空间浪费太多。标<br><img src="/media/17304402487913/17307003523033.jpg"></p>
-<br/>
-
-<h2 id="标记－整理-mark-compact"><a href="#标记－整理-mark-compact" class="headerlink" title="标记－整理 (mark-compact)"></a>标记－整理 (mark-compact)</h2><br/>
-
-<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法，而后者是移动式的。其中的标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</p>
-<p><img src="/media/17304402487913/17307017755862.jpg"></p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:58.599Z" title="2025/5/16 11:11:58">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">11 分钟读完 (大约1582个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/CAP%E7%90%86%E8%AE%BA%20/">CAP理论</a></p><div class="content"><p>[TOC]</p>
-<p>CAP 定理（Consistency、Availability、Partition Tolerance Theorem）,这个定理里描述了一个分布式的系统中，涉及共享数据问题时，以下三个特性最多只能同时满足其中两个：</p>
-<ul>
-<li><p>一致性（Consistency）：代表数据在任何时刻、任何分布式节点中所看到的都是符合预期的。</p>
-</li>
-<li><p>可用性（Availability）：代表系统不间断地提供服务的能力，理解可用性要先理解与其密切相关两个指标：可靠性（Reliability）和可维护性（Serviceability）。可靠性使用平均无故障时间（Mean Time Between Failure，MTBF）来度量；可维护性使用平均可修复时间（Mean Time To Repair，MTTR）来度量。可用性衡量系统可以正常使用的时间与总时间之比，其表征为：A&#x3D;MTBF&#x2F;（MTBF+MTTR），即可用性是由可靠性和可维护性计算得出的比例值，譬如 99.9999%可用，即代表平均年故障修复时间为 32 秒。</p>
-</li>
-<li><p>分区容忍性（Partition Tolerance）：代表分布式环境中部分节点因网络原因而彼此失联后，即与其他节点形成“网络分区”时，系统仍能正确地提供服务的能力。</p>
-</li>
-</ul>
-<p>例如一个来自最终用户的交易请求，将交由账号、商家和仓库服务集群中某一个节点来完成响应，每一个单独的服务节点都有自己的数据库：<br><img src="/media/17345791777624/17345948632219.jpg"></p>
-<ul>
-<li>如果该变动信息没有及时同步给其他账号节点，将导致有可能发生用户购买另一商品时，被分配给到另一个节点处理，由于<strong>看到账号上有不正确的余额而错误地发生了原本无法进行的交易</strong>，此为一致性问题。</li>
-<li>如果由于要把该变动信息同步给其他账号节点，<strong>必须暂时停止对该用户的交易服务</strong>，直至数据同步一致后再重新恢复，将可能导致用户在下一次购买商品时，因系统暂时无法提供服务而被拒绝交易，此为可用性问题。</li>
-<li>如果由于账号服务集群中某一部分节点，<strong>因出现网络问题，无法正常与另一部分节点交换账号变动信息</strong>，此时服务集群中无论哪一部分节点对外提供的服务都可能是不正确的，整个集群能否承受由于部分节点之间的连接中断而仍然能够正确地提供服务，此为分区容忍性。</li>
-</ul>
-<p>舍弃 C、A、P 时所带来的不同影响：</p>
-<ul>
-<li><p>如果放弃分区容忍性（CA without P），意味着我们将假设节点之间通信永远是可靠的。永远可靠的通信在分布式系统中必定不成立的，这不是你想不想的问题，而是只要用到网络来共享数据，分区现象就会始终存在。在现实中，最容易找到放弃分区容忍性的例子便是传统的关系数据库集群，这样的集群虽然依然采用由网络连接的多个节点来协同工作，但数据却不是通过网络来实现共享的。以 Oracle 的 RAC 集群为例，它的每一个节点均有自己独立的 SGA、重做日志、回滚日志等部件，但各个节点是通过共享存储中的同一份数据文件和控制文件来获取数据的，通过共享磁盘的方式来避免出现网络分区。因而 Oracle RAC 虽然也是由多个实例组成的数据库，但它并不能称作是分布式数据库。</p>
-</li>
-<li><p>如果放弃可用性（CP without A），意味着我们将假设一旦网络发生分区，节点之间的信息同步时间可以无限制地延长，此时，问题相当于退化到前面“全局事务”中讨论的一个系统使用多个数据源的场景之中，我们可以通过 2PC&#x2F;3PC 等手段，同时获得分区容忍性和一致性。在现实中，选择放弃可用性的 CP 系统情况一般用于对数据质量要求很高的场合中，除了 DTP 模型的分布式数据库事务外，著名的 HBase 也是属于 CP 系统，以 HBase 集群为例，假如某个 RegionServer 宕机了，这个 RegionServer 持有的所有键值范围都将离线，直到数据恢复过程完成为止，这个过程要消耗的时间是无法预先估计的。</p>
-</li>
-<li><p>如果放弃一致性（AP without C），意味着我们将假设一旦发生分区，节点之间所提供的数据可能不一致。选择放弃一致性的 AP 系统目前是设计分布式系统的主流选择，因为 P 是分布式网络的天然属性，你再不想要也无法丢弃；而 A 通常是建设分布式的目的，如果可用性随着节点数量增加反而降低的话，很多分布式系统可能就失去了存在的价值，除非银行、证券这些涉及金钱交易的服务，宁可中断也不能出错，否则多数系统是不能容忍节点越多可用性反而越低的。目前大多数 NoSQL 库和支持分布式的缓存框架都是 AP 系统，以 Redis 集群为例，如果某个 Redis 节点出现网络分区，那仍不妨碍各个节点以自己本地存储的数据对外提供缓存服务，但这时有可能出现请求分配到不同节点时返回给客户端的是不一致的数据。</p>
 </li>
 </ul>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:28.564Z" title="2025/5/16 11:12:28">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">26 分钟读完 (大约3959个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/7%E7%A7%8D%E7%BB%8F%E5%85%B8%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/">7种经典垃圾收集器</a></p><div class="content"><p>[TOC]</p>
@@ -537,6 +280,151 @@
 <blockquote>
 <p>回收阶段（Evacuation）其实本也有想过设计成与用户程序 一起并发执行，但这件事情做起来比较复杂，考虑到G1只是回收一部分Region，停顿时间是用户可控制的，所以并不迫切去实现，而选择把这个特性放到了G1之后出现的低延迟垃圾收集器（即ZGC） 中</p>
 </blockquote>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:46.862Z" title="2025/5/16 11:12:46">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">8 分钟读完 (大约1274个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0/">三色标记</a></p><div class="content"><p>[TOC]</p>
+<br/>
+
+<p>可达性分析算法理论上要求全过程都基于一个能保障一致性的快照中才能够进行分析， 这意味着必须全程冻结用户线程的运行。在根节点枚举这个步骤中，由于GC Roots相比 起整个Java堆中全部的对象毕竟还算是极少数，且在各种优化技巧（如OopMap ）的加持下，它带来的停顿已经是非常短暂且相对固定（不随堆容量而增长）的了。可<strong>从GC Roots再继续往下遍历对象图，这一步骤的停顿时间就必定会与Java堆容量直接成正比例关系</strong>：<strong>堆越大，存储的对象越多，对象图结构越复杂，要标记更多对象而产生的停顿时间自然就更长。</strong></p>
+<br/>
+
+<h2 id="三色标记"><a href="#三色标记" class="headerlink" title="三色标记"></a>三色标记</h2><p>三色标记（Tri-color Marking）把遍历对象图过程中遇到的对象，按照“是否访问过”这个条件标记成以下三种颜色：<br><br/></p>
+<ul>
+<li><p>白色：表示对象尚未被垃圾收集器访问过。显然在可达性分析刚刚开始的阶段，所有的对象都是白色的，若在分析结束的阶段，仍然是白色的对象，即代表不可达。</p>
+</li>
+<li><p>黑色：表示对象已经被垃圾收集器访问过，且<strong>这个对象的所有引用都已经扫描过</strong>。黑色的对象代表已经扫描过，它是安全存活的，如果有其他对象引用指向了黑色对象，无须重新扫描一遍。黑色对象不可能直接（不经过灰色对象）指向某个白色对象。</p>
+</li>
+<li><p>灰色：表示对象已经被垃圾收集器访问过，但<strong>这个对象上至少存在一个引用还没有被扫描过</strong>。</p>
+</li>
+</ul>
+<p>如果在标记过程中用户线程此时是冻结的，只有收集器线程在工作，那不会有任何问题。但如果用户线程与收集器是并发工作，收集器在对象图上标记颜色，同时用户线程在修改引用 关系——即修改对象图的结构，这样可能出现两种后果：</p>
+<ol>
+<li><strong>多标</strong>：把原本消亡的对象错误标记为存活，这不是好事，但其实是可以容忍的，只不过产生了一点逃过本次收集的浮动垃圾而已，下次收集清理掉就好。</li>
+<li><strong>漏标</strong>：把原本存活的对象错误标记为已消亡，这就是非常致命的后果，程序肯定会因此发生错误。</li>
+</ol>
+<p><img src="/media/17308567619994/17316559737619.jpg"></p>
+<p>Wilson于1994年在理论上证明了，当且仅当以下两个条件同时满足时，会产生“对象消失”的问题，即原本应该是<strong>黑色的对象被误标为白色</strong>：</p>
+<ul>
+<li><p>赋值器插入了一条或多条从黑色对象到白色对象的新引用</p>
+</li>
+<li><p>赋值器删除了全部从灰色对象到该白色对象的直接或间接引用</p>
+</li>
+</ul>
+<p>我们要解决并发扫描时的对象消失问题，只需破坏这两个条件的任意一个即可。由此分别 产生了两种解决方案：增量更新（Incremental Update）和原始快照（Snapshot At The Beginning，SATB）。</p>
+<ol>
+<li>增量更新</li>
+</ol>
+<p>增量更新要破坏的是第一个条件，<strong>当黑色对象插入新的指向白色对象的引用关系时，就将这个新插入的引用记录下来</strong>，<strong>等并发扫描结束之后，再将这些记录过的引用关系中的黑色对象为根，重新扫描一次</strong>。这可以简化理解为，黑色对象一旦新插入了指向白色对象的引用之后，它就变回灰色对象了。</p>
+<ol>
+<li>原始快照</li>
+</ol>
+<p>原始快照要破坏的是第二个条件，<strong>当灰色对象要删除指向白色对象的引用关系时，就将这个要删除的引用记录下来</strong>，<strong>在并发扫描结束之后，再将这些记录过的引用关系中的灰色对象为根，重新扫描一次</strong>。这也可以简化理解为，无论引用关系删除与否，都会按照刚刚开始扫描那一刻的对象图快照来进行搜索。</p>
+<p>以上无论是对引用关系记录的插入还是删除，虚拟机的记录操作都是通过写屏障实现的。在 HotSpot虚拟机中，增量更新和原始快照这两种解决方案都有实际应用，譬如，<u>CMS是基于增量更新来做并发标记的，G1、Shenandoah则是用原始快照来实现</u></p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:35.632Z" title="2025/5/16 11:12:35">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">6 分钟读完 (大约837个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E7%90%86%E8%AE%BA/">分代收集理论</a></p><div class="content"><p>[TOC]</p>
+<br/>
+
+<h2 id="分代假说"><a href="#分代假说" class="headerlink" title="分代假说"></a>分代假说</h2><p>它建立在三个分代假说之上：</p>
+<ol>
+<li>弱分代假说（Weak Generational Hypothesis）：绝大多数对象都是朝生夕灭的。</li>
+<li>强分代假说（Strong Generational Hypothesis）：熬过越多次垃圾收集过程的对象就越难以消亡。</li>
+<li>跨代引用假说（Intergenerational Reference Hypothesis）：跨代引用相对于同代引用来说仅占极少数。</li>
+</ol>
+<br/>
+
+<p>收集器应该将Java堆划分出不同的区域，然后将回收对象依据其年龄（年龄即对象熬过垃圾收集过程的次数）分配到不同的区域之中存储：</p>
+<p>如果一个区域中大多数对象都是朝生夕灭，难以熬过垃圾收集过程的话，那么把它们集中放在一起，每次回收时只<strong>关注如何保留少量存活而不是去标记那些大量将要被回收的对象</strong>，就能以较低代价回收到大量的空间；*—- 弱分代假说*</p>
+<p>如果剩下的都是难以消亡的对象，那把它们集中放在一块， 虚拟机便可以使用较低的频率来回收这个区域，这就同时兼顾了垃圾收集的时间开销和内存的空间有效利用。*—- 强分代假说*</p>
+<p>我们就不应再为了少量的跨代引用去扫描整个老年代，也不必浪费空间专门记录每一个对象是否存在及存在哪些跨代引用，<strong>只需在新生代上建立一个全局的数据结构（该结构被称 为“记忆集”，Remembered Set</strong>），<strong>这个结构把老年代划分成若干小块，标识出老年代的哪一块内存会存在跨代引用</strong>。此后当发生MinorGC时，只有包含了跨代引用的小块内存里的对象才会被加入到GC Roots进行扫描。虽然这种方法需要在对象改变引用关系（如将自己或者某个属性赋值）时维护记录数据的正确性，会增加一些运行时的开销，但比起收集时扫描整个老年代来说仍然是划算的.   <em>—- 跨代引用假说</em></p>
+<h2 id="GC收集名称定义"><a href="#GC收集名称定义" class="headerlink" title="GC收集名称定义"></a>GC收集名称定义</h2><p>部分收集（Partial GC）：指目标不是完整收集整个Java堆的垃圾收集，其中又分为：<br><br/></p>
+<ul>
+<li>新生代收集（Minor GC&#x2F;Young GC）：指目标只是新生代的垃圾收集。</li>
+<li>老年代收集（Major GC&#x2F;Old GC）：指目标只是老年代的垃圾收集。目前只有CMS收集器会有单独收集老年代的行为。另外请注意“Major GC”这个说法现在有点混淆，在不同资料上常有不同所指，读者需按上下文区分到底是指老年代的收集还是整堆收集。</li>
+<li>混合收集（Mixed GC）：指目标是收集整个新生代以及部分老年代的垃圾收集。目前只有G1收集器会有这种行为。</li>
+</ul>
+<br/>
+
+<p>整堆收集（Full GC）：收集整个Java堆和方法区的垃圾收集。</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:39.583Z" title="2025/5/16 11:12:39">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">3 分钟读完 (大约393个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95/">可达性分析算法</a></p><div class="content"><br/>
+
+<p>通过一系列称为“GC Roots”的根对象作为起始节点集，从这些节点开始，根据引用关系向下搜索，搜索过 程所走过的路径称为“引用链”（Reference Chain），如果某个对象到GC Roots间没有任何引用链相连， 或者用图论的话来说就是从GC Roots到这个对象不可达时，则证明此对象是不可能再被使用的。<br><br/></p>
+<p><img src="/media/17304386866747/17304388367110.jpg"></p>
+<br/>
+
+<h3 id="在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种："><a href="#在Java技术体系里面，固定可作为GC-Roots的对象包括以下几种：" class="headerlink" title="在Java技术体系里面，固定可作为GC Roots的对象包括以下几种："></a>在Java技术体系里面，固定可作为GC Roots的对象包括以下几种：</h3><br/>
+
+<ol>
+<li>在虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的 参数、局部变量、临时变量等。</li>
+<li>在<strong>方法区中类静态属性</strong>引用的对象，譬如Java类的引用类型静态变量。</li>
+<li>在<strong>方法区中常量</strong>引用的对象，譬如字符串常量池（String Table）里的引用。</li>
+<li>在本地方法栈中JNI（即通常所说的Native方法）引用的对象。</li>
+<li>Java虚拟机内部的引用，如基本数据类型对应的Class对象，一些常驻的异常对象（比如 NullPointExcepiton、OutOfMemoryError）等，还有系统类加载器。</li>
+<li>所有被同步锁（synchronized关键字）持有的对象。</li>
+<li>反映Java虚拟机内部情况的JM XBean、JVM TI中注册的回调、本地代码缓存等。</li>
+</ol>
+<br/>
+
+
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:43.660Z" title="2025/5/16 11:12:43">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">5 分钟读完 (大约788个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AD%96%E7%95%A5-%E5%9F%BA%E6%9C%AC%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/">基本垃圾回收算法</a></p><div class="content"><p>[TOC]</p>
+<br/>
+
+<blockquote>
+<p>在对基本回收策略进行描述时，我们假设赋值器运行在一个或者多个线程之上，<br>且只有一个回收器线程，当回收器线程运行时，所有的赋值器线程均处于停止状态。这种<br><strong>万物静止(stop the world)</strong> 的策略大幅简化了回收器的实现。从赋值器线程角度来看，回收过程的执行是原子性的，即赋值器线程感知不到回收器的任何中间状态，回收器也不会受到赋值器线程的任何干扰。</p>
+</blockquote>
+<br/>
+
+<h2 id="标记－清除（mark-sweep"><a href="#标记－清除（mark-sweep" class="headerlink" title="标记－清除（mark-sweep)"></a>标记－清除（mark-sweep)</h2><br/>
+
+<p>回收过程分为两个阶段</p>
+<ul>
+<li>第一阶段为追踪(trace) 阶段，即回收器从根集合（寄存器、线程栈、全局变址）开始遍历对象图，并标记(mark) 所遇到的每个对象；</li>
+<li>第二阶段为清扫 (sweep)阶段，即回收器检查堆中每一个对象，<br>并将所有<strong>未标记的对象</strong>当作垃圾进行回收。</li>
+</ul>
+<p><img src="/media/17304402487913/17306989696842.jpg"></p>
+<p>主要缺点有两个：</p>
+<ul>
+<li>第一个是<strong>执行效率不稳定</strong>，如果Java堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；</li>
+<li>第二个是<strong>内存空间的碎片化问题</strong>，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
+</ul>
+<br/>
+
+<h2 id="标记－复制-mark-copy"><a href="#标记－复制-mark-copy" class="headerlink" title="标记－复制 (mark-copy)"></a>标记－复制 (mark-copy)</h2><br/>
+
+<p>它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
+<p>每次都是针对整个半区进行内存回收，分配内存时也就不用考虑有 间碎片的复杂情况，只要移动堆顶指针，按顺序分配即可。这样实现简单，运行高效。</p>
+<p>这种复制回收算法的代价是将可用内存缩小为了原来的一半，空间浪费太多。标<br><img src="/media/17304402487913/17307003523033.jpg"></p>
+<br/>
+
+<h2 id="标记－整理-mark-compact"><a href="#标记－整理-mark-compact" class="headerlink" title="标记－整理 (mark-compact)"></a>标记－整理 (mark-compact)</h2><br/>
+
+<p>标记-清除算法与标记-整理算法的本质差异在于前者是一种非移动式的回收算法，而后者是移动式的。其中的标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向内存空间一端移动，然后直接清理掉边界以外的内存。</p>
+<p><img src="/media/17304402487913/17307017755862.jpg"></p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:58.599Z" title="2025/5/16 11:11:58">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">11 分钟读完 (大约1582个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/CAP%E7%90%86%E8%AE%BA%20/">CAP理论</a></p><div class="content"><p>[TOC]</p>
+<p>CAP 定理（Consistency、Availability、Partition Tolerance Theorem）,这个定理里描述了一个分布式的系统中，涉及共享数据问题时，以下三个特性最多只能同时满足其中两个：</p>
+<ul>
+<li><p>一致性（Consistency）：代表数据在任何时刻、任何分布式节点中所看到的都是符合预期的。</p>
+</li>
+<li><p>可用性（Availability）：代表系统不间断地提供服务的能力，理解可用性要先理解与其密切相关两个指标：可靠性（Reliability）和可维护性（Serviceability）。可靠性使用平均无故障时间（Mean Time Between Failure，MTBF）来度量；可维护性使用平均可修复时间（Mean Time To Repair，MTTR）来度量。可用性衡量系统可以正常使用的时间与总时间之比，其表征为：A&#x3D;MTBF&#x2F;（MTBF+MTTR），即可用性是由可靠性和可维护性计算得出的比例值，譬如 99.9999%可用，即代表平均年故障修复时间为 32 秒。</p>
+</li>
+<li><p>分区容忍性（Partition Tolerance）：代表分布式环境中部分节点因网络原因而彼此失联后，即与其他节点形成“网络分区”时，系统仍能正确地提供服务的能力。</p>
+</li>
+</ul>
+<p>例如一个来自最终用户的交易请求，将交由账号、商家和仓库服务集群中某一个节点来完成响应，每一个单独的服务节点都有自己的数据库：<br><img src="/media/17345791777624/17345948632219.jpg"></p>
+<ul>
+<li>如果该变动信息没有及时同步给其他账号节点，将导致有可能发生用户购买另一商品时，被分配给到另一个节点处理，由于<strong>看到账号上有不正确的余额而错误地发生了原本无法进行的交易</strong>，此为一致性问题。</li>
+<li>如果由于要把该变动信息同步给其他账号节点，<strong>必须暂时停止对该用户的交易服务</strong>，直至数据同步一致后再重新恢复，将可能导致用户在下一次购买商品时，因系统暂时无法提供服务而被拒绝交易，此为可用性问题。</li>
+<li>如果由于账号服务集群中某一部分节点，<strong>因出现网络问题，无法正常与另一部分节点交换账号变动信息</strong>，此时服务集群中无论哪一部分节点对外提供的服务都可能是不正确的，整个集群能否承受由于部分节点之间的连接中断而仍然能够正确地提供服务，此为分区容忍性。</li>
+</ul>
+<p>舍弃 C、A、P 时所带来的不同影响：</p>
+<ul>
+<li><p>如果放弃分区容忍性（CA without P），意味着我们将假设节点之间通信永远是可靠的。永远可靠的通信在分布式系统中必定不成立的，这不是你想不想的问题，而是只要用到网络来共享数据，分区现象就会始终存在。在现实中，最容易找到放弃分区容忍性的例子便是传统的关系数据库集群，这样的集群虽然依然采用由网络连接的多个节点来协同工作，但数据却不是通过网络来实现共享的。以 Oracle 的 RAC 集群为例，它的每一个节点均有自己独立的 SGA、重做日志、回滚日志等部件，但各个节点是通过共享存储中的同一份数据文件和控制文件来获取数据的，通过共享磁盘的方式来避免出现网络分区。因而 Oracle RAC 虽然也是由多个实例组成的数据库，但它并不能称作是分布式数据库。</p>
+</li>
+<li><p>如果放弃可用性（CP without A），意味着我们将假设一旦网络发生分区，节点之间的信息同步时间可以无限制地延长，此时，问题相当于退化到前面“全局事务”中讨论的一个系统使用多个数据源的场景之中，我们可以通过 2PC&#x2F;3PC 等手段，同时获得分区容忍性和一致性。在现实中，选择放弃可用性的 CP 系统情况一般用于对数据质量要求很高的场合中，除了 DTP 模型的分布式数据库事务外，著名的 HBase 也是属于 CP 系统，以 HBase 集群为例，假如某个 RegionServer 宕机了，这个 RegionServer 持有的所有键值范围都将离线，直到数据恢复过程完成为止，这个过程要消耗的时间是无法预先估计的。</p>
+</li>
+<li><p>如果放弃一致性（AP without C），意味着我们将假设一旦发生分区，节点之间所提供的数据可能不一致。选择放弃一致性的 AP 系统目前是设计分布式系统的主流选择，因为 P 是分布式网络的天然属性，你再不想要也无法丢弃；而 A 通常是建设分布式的目的，如果可用性随着节点数量增加反而降低的话，很多分布式系统可能就失去了存在的价值，除非银行、证券这些涉及金钱交易的服务，宁可中断也不能出错，否则多数系统是不能容忍节点越多可用性反而越低的。目前大多数 NoSQL 库和支持分布式的缓存框架都是 AP 系统，以 Redis 集群为例，如果某个 Redis 节点出现网络分区，那仍不妨碍各个节点以自己本地存储的数据对外提供缓存服务，但这时有可能出现请求分配到不同节点时返回给客户端的是不一致的数据。</p>
+</li>
+</ul>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:55.018Z" title="2025/5/16 11:11:55">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">2 分钟读完 (大约259个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/%E5%85%B1%E4%BA%AB%E4%BA%8B%E5%8A%A1/">共享事务</a></p><div class="content"><p>共享事务（Share Transaction）是指多个服务共用同一个数据源。</p>
+<p>为了实现共享事务，就必须新增一个“交易服务器”的中间角色，无论是用户服务、商家服务还是仓库服务，它们都通过同一台交易服务器来与数据库打交道。如果将交易服务器的对外接口按照 JDBC 规范来实现的话，那它完全可以视为是一个独立于各个服务的远程数据库连接池，或者直接作为数据库代理来看待。此时三个服务所发出的交易请求就有可能做到交由交易服务器上的同一个数据库连接，通过本地事务的方式完成。</p>
+<p><strong>交易服务器根据不同服务节点传来的同一个事务 ID，使用同一个数据库连接来处理跨越多个服务的交易事务</strong></p>
+<p><img src="/media/17345765505995/17345791361767.jpg"></p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:51.448Z" title="2025/5/16 11:11:51">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">33 分钟读完 (大约4907个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">分布式事务</a></p><div class="content"><p>[TOC]</p>
 <p>分布式事务（Distributed Transaction）特指多个服务同时访问多个数据源的事务处理机制。</p>
 <p><strong>分布式事务中没有一揽子包治百病的解决办法，因地制宜地选用合适的事务处理方案才是唯一有效的做法。</strong></p>

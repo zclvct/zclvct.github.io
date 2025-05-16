@@ -29,11 +29,7 @@
       switchTab();
       window.addEventListener('hashchange', switchTab, false);
   })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:55.018Z" title="2025/5/16 11:11:55">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">2 分钟读完 (大约259个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/%E5%85%B1%E4%BA%AB%E4%BA%8B%E5%8A%A1/">共享事务</a></p><div class="content"><p>共享事务（Share Transaction）是指多个服务共用同一个数据源。</p>
-<p>为了实现共享事务，就必须新增一个“交易服务器”的中间角色，无论是用户服务、商家服务还是仓库服务，它们都通过同一台交易服务器来与数据库打交道。如果将交易服务器的对外接口按照 JDBC 规范来实现的话，那它完全可以视为是一个独立于各个服务的远程数据库连接池，或者直接作为数据库代理来看待。此时三个服务所发出的交易请求就有可能做到交由交易服务器上的同一个数据库连接，通过本地事务的方式完成。</p>
-<p><strong>交易服务器根据不同服务节点传来的同一个事务 ID，使用同一个数据库连接来处理跨越多个服务的交易事务</strong></p>
-<p><img src="/media/17345765505995/17345791361767.jpg"></p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:47.261Z" title="2025/5/16 11:11:47">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">20 分钟读完 (大约2938个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E4%B8%8E%E5%85%A8%E5%B1%80%E4%BA%8B%E5%8A%A1/">本地事务与全局事务</a></p><div class="content"><p>[Toc]</p>
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:47.261Z" title="2025/5/16 11:11:47">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">20 分钟读完 (大约2938个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/%E6%9C%AC%E5%9C%B0%E4%BA%8B%E5%8A%A1%E4%B8%8E%E5%85%A8%E5%B1%80%E4%BA%8B%E5%8A%A1/">本地事务与全局事务</a></p><div class="content"><p>[Toc]</p>
 <h1 id="本地事务"><a href="#本地事务" class="headerlink" title="本地事务"></a>本地事务</h1><p>本地事务是最基础的一种事务解决方案，只适用于单个服务使用单个数据源的场景。从应用角度看，它是直接依赖于数据源本身提供的事务能力来工作的，在程序代码层面，最多只能对事务接口做一层标准化的包装（如 JDBC 接口），并不能深入参与到事务的运作过程当中，事务的开启、终止、提交、回滚、嵌套、设置隔离级别，乃至与应用代码贴近的事务传播方式，全部都要依赖底层数据源的支持才能工作。</p>
 <h1 id="全局事务"><a href="#全局事务" class="headerlink" title="全局事务"></a>全局事务</h1><p>全局事务被限定为一种适用于单个服务使用多个数据源场景的事务解决方案。</p>
 <h2 id="本地事务的问题"><a href="#本地事务的问题" class="headerlink" title="本地事务的问题"></a>本地事务的问题</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public void buyBook(PaymentBill bill) &#123;</span><br><span class="line">    userTransaction.begin();</span><br><span class="line">    warehouseTransaction.begin();</span><br><span class="line">    businessTransaction.begin();</span><br><span class="line">	try &#123;</span><br><span class="line">        userAccountService.pay(bill.getMoney());</span><br><span class="line">        warehouseService.deliver(bill.getItems());</span><br><span class="line">        businessAccountService.receipt(bill.getMoney());</span><br><span class="line">        userTransaction.commit();</span><br><span class="line">        warehouseTransaction.commit();</span><br><span class="line">        businessTransaction.commit();</span><br><span class="line">	&#125; catch(Exception e) &#123;</span><br><span class="line">        userTransaction.rollback();</span><br><span class="line">        warehouseTransaction.rollback();</span><br><span class="line">        businessTransaction.rollback();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -77,6 +73,71 @@
 <p>同样也是由于事务失败回滚概率变小的原因，在三段式提交中，如果在 PreCommit 阶段之后发生了协调者宕机，即参与者没有能等到 DoCommit 的消息的话，<strong>默认的操作策略将是提交事务而不是回滚事务或者持续等待，这就相当于避免了协调者单点问题的风险</strong>。</p>
 <p><img src="/media/17344159697744/17345757001062.jpg"></p>
 <p>三段式提交对单点问题和回滚时的性能问题有所改善，但是它对一致性风险问题并未有任何改进，在这方面它面临的风险甚至反而是略有增加了的。譬如，<strong>进入 PreCommit 阶段之后，协调者发出的指令不是 Ack 而是 Abort，而此时因网络问题，有部分参与者直至超时都未能收到协调者的 Abort 指令的话，这些参与者将会错误地提交事务，这就产生了不同参与者之间数据不一致的问题。</strong></p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:31.831Z" title="2025/5/16 11:12:31">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/java/">java</a></span><span class="level-item">26 分钟读完 (大约3902个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/java/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E4%BD%8E%E5%BB%B6%E8%BF%9F%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/">低延迟垃圾收集器</a></p><div class="content"><p>[TOC]</p>
+<p>下图中浅色阶段表示必须挂起用户线程，深色表示收集器线程与用户线程是并发工作的。</p>
+<p>在CMS和G1之前的全部收集器，其工作的所有步骤都会产生“Stop The World”式的停顿； CMS和G1分别使用增量更新和原始快照技术，实现了标记阶段的并发，不会因管理的堆内存变大，要标记的对象变多而导致停顿时间随之增长。但是对于标记阶段之后的处理，仍未得到妥善解决。<br><strong>CMS使用标记-清除算法，虽然避免了整理阶段收集器带来的停顿，但是清除算法不论如何 化改进，在设计原理上避免不了空间碎片的产生，随着空间碎片不断淤积最终依然逃不过“Stop The World”的命运</strong>。<br><strong>G1虽然可以按更小的粒度进行回收，从而抑制整理阶段出现时间过长的停顿，但毕竟 也还是要暂停的</strong>。</p>
+<p><img src="/media/17321588916542/17321596868873.jpg"></p>
+<h1 id="Shenandoah-谢南多亚-收集器"><a href="#Shenandoah-谢南多亚-收集器" class="headerlink" title="Shenandoah(谢南多亚)收集器"></a>Shenandoah(谢南多亚)收集器</h1><p>Shenandoah也是使用基于Region的堆内存布局，同样 有着用于存放大对象的Humongous Region，默认的回收策略也同样是优先处理回收价值最大的 Region……但在管理堆内存方面，它与G1至少有三个明显的不同之处.</p>
+<ol>
+<li>支持并发的整理算法,G1的回收阶段是可以多线程并行的，但却不能与用户线程并发.</li>
+<li>Shenandoah（目前）是默认不使用分代收集的，换言之，不会有 专门的新生代Region或者老年代Region的存在，没有实现分代，并不是说分代对Shenandoah没有价值， 这更多是出于性价比的权衡，基于工作量上的考虑而将其放到优先级较低的位置上.</li>
+<li>Shenandoah摒弃了在G1中耗费大量内存和计算资源去维护的记忆集，改用名为“连接矩阵”（Connection Matrix）的全局数据结构来记录跨Region的引用关系，降低了处理跨代指针时的记忆集维护消耗，也降低了伪共享问题的发生概率.</li>
+</ol>
+<p><img src="/media/17321588916542/17321668602765.jpg"></p>
+<ul>
+<li><p>初始标记（Initial Marking）：</p>
+<p>  与G1一样，首先标记与GC Roots直接关联的对象，这个阶段仍是“Stop The World”的，但停顿时间与堆大小无关，只与GC Roots的数量相关。</p>
+</li>
+<li><p>并发标记（Concurrent Marking）：</p>
+<p>  与G1一样，遍历对象图，标记出全部可达的对象，这个阶段是与用户线程一起并发的，时间长短取决于堆中存活对象的数量以及对象图的结构复杂程度。</p>
+</li>
+<li><p>最终标记（Final M arking）：</p>
+<p>  与G1一样，处理剩余的SATB扫描，并在这个阶段统计出回收价值 最高的Region，将这些Region构成一组回收集（Collection Set）。最终标记阶段也会有一小段短暂的停顿。</p>
+</li>
+<li><p>并发清理（Concurrent Cleanup ）：</p>
+<p>  这个阶段用于清理那些整个区域内连一个存活对象都没有找到的Region（这类Region被称为Immediate Garbage Region)。</p>
+</li>
+<li><p>并发回收（Concurrent Evacuation）：</p>
+<p>  并发回收阶段是Shenandoah与之前HotSpot中其他收集器的核心差异。在这个阶段，Shenandoah要把回收集里面的存活对象先复制一份到其他未被使用的Region之中。复制对象这件事情如果将用户线程冻结起来再做那是相当简单的，但如果两者必须要同时并发进行的话，就变得复杂起来了。其困难点是在移动对象的同时，用户线程仍然可能不停对被移动的对象 进行读写访问，移动对象是一次性的行为，但移动之后整个内存中所有指向该对象的引用都还是旧对象的地址，这是很难一瞬间全部改变过来的。对于并发回收阶段遇到的这些困难，Shenandoah将会通过读屏障和被称为“Brooks Pointers”的转发指针来解决。并发回收阶段运行的时间长短取决于回收集的大小。</p>
+</li>
+<li><p>初始引用更新（Initial Update Reference）：</p>
+<p>  并发回收阶段复制对象结束后，还需要把堆中所有指向旧对象的引用修正到复制后的新地址，这个操作称为引用更新。引用更新的初始化阶段实际上并未做什么具体的处理，设立这个阶段只是为了建立一个线程集合点，确保所有并发回收阶段中进行的收集器线程都已完成分配给它们的对象移动任务而已。初始引用更新时间很短，会产生一个非常短暂的停顿。</p>
+</li>
+<li><p>并发引用更新（Concurrent Update Reference）：</p>
+<p>  真正开始进行引用更新操作，这个阶段是与用户线程一起并发的，时间长短取决于内存中涉及的引用数量的多少。并发引用更新与并发标记不同，它不再需要沿着对象图来搜索，只需要按照内存物理地址的顺序，线性地搜索出引用类型，把旧值改为新值即可。</p>
+</li>
+<li><p>最终引用更新（Final Update Reference）：</p>
+<p>  解决了堆中的引用更新后，还要修正存在于GC Roots 中的引用。这个阶段是Shenandoah的最后一次停顿，停顿时间只与GC Roots的数量相关。</p>
+</li>
+<li><p>并发清理（Concurrent Cleanup ）：</p>
+<p>  经过并发回收和引用更新之后，整个回收集中所有的Region已再无存活对象，这些Region都变成Immediate Garbage Regions了，最后再调用一次并发清理过程来回收 这些Region的内存空间，供以后新对象分配使用。</p>
+</li>
+</ul>
+<p><img src="/media/17321588916542/17321669915068.jpg"></p>
+<p><img src="/media/17321588916542/17321690862577.jpg"></p>
+<h2 id="ZGC收集器"><a href="#ZGC收集器" class="headerlink" title="ZGC收集器"></a>ZGC收集器</h2><p>ZGC和Shenandoah的目标是高度相似的，都希望在尽可能对吞吐量影响不太大的前提下，实现在任意堆内存大小下都可以把垃圾收集的停顿时间限制在十毫秒以内的低延迟。</p>
+<p>ZGC也采用基于Region的堆内存布局，但与它们不同的是，ZGC的Region（在一些官方资料中将它称为Page或者ZPage）具有动态性——动态创建和销毁，以及动态的区域容量大小。在x64硬件平台下，ZGC的 Region可以具有如图3-19所示的大、中、小三类容量：</p>
+<ul>
+<li>小型Region（Small Region）：容量固定为2MB，用于放置小于256KB的小对象。</li>
+<li>中型Region（Medium Region）：容量固定为32MB，用于放置大于等于256KB但小于4M B的对 象。</li>
+<li>大型Region（Large Region）：容量不固定，可以动态变化，但必须为2MB的整数倍，用于放置4M B或以上的大对象。每个大型Region中只会存放一个大对象，这也预示着虽然名字叫作“大型Region”，但它的实际容量完全有可能小于中型Region，最小容量可低至4MB。大型Region在ZGC的实现中是不会被重分配的，因为复制一个大对象的代价非常高昂。</li>
+</ul>
+<p><img src="/media/17321588916542/17321713938602.jpg"></p>
+<p>ZGC收集器有一个标志性的设计是它采用的染色指针技术（Colored Pointer，其他类似的技术中可 能将它称为Tag Pointer或者Version Pointer）<br><img src="/media/17321588916542/17321718622056.jpg"></p>
+<ul>
+<li><p>染色指针可以使得一旦某个Region的存活对象被移走之后，这个Region立即就能够被释放和重用掉，而不必等待整个堆中所有指向该Region的引用都被修正后才能清理。这点相比起Shenandoah是一个颇大的优势，使得理论上只要还有一个空闲Region，ZGC就能完成收集，而Shenandoah需要等到引用 更新阶段结束以后才能释放回收集中的Region，这意味着堆中几乎所有对象都存活的极端情况，需要 1∶1复制对象到新Region的话，就必须要有一半的空闲Region来完成收集。至于为什么染色指针能够导致这样的结果，笔者将在后续解释其“自愈”特性的时候进行解释。</p>
+</li>
+<li><p>染色指针可以大幅减少在垃圾收集过程中内存屏障的使用数量，设置内存屏障，尤其是写屏障的 目的通常是为了记录对象引用的变动情况，如果将这些信息直接维护在指针中，显然就可以省去一些 专门的记录操作。实际上，到目前为止ZGC都并未使用任何写屏障，只使用了读屏障（一部分是染色指针的功劳，一部分是ZGC现在还不支持分代收集，天然就没有跨代引用的问题）。内存屏障对程序 运行时性能的损耗在前面章节中已经讲解过，能够省去一部分的内存屏障，显然对程序运行效率是大 有裨益的，所以ZGC对吞吐量的影响也相对较低。</p>
+</li>
+<li><p>染色指针可以作为一种可扩展的存储结构用来记录更多与对象标记、重定位过程相关的数据，以便日后进一步提高性能。现在Linux下的64位指针还有前18位并未使用，它们虽然不能用来寻址，却可 以通过其他手段用于信息记录。如果开发了这18位，既可以腾出已用的4个标志位，将ZGC可支持的 最大堆内存从4TB拓展到64TB，也可以利用其余位置再存储更多的标志，譬如存储一些追踪信息来让 垃圾收集器在移动对象时能将低频次使用的对象移动到不常访问的内存区域。</p>
+</li>
+</ul>
+<ol>
+<li>并发标记（Concurrent Mark）：与G1、Shenandoah一样，并发标记是遍历对象图做可达性分析的 阶段，前后也要经过类似于G1、Shenandoah的初始标记、最终标记（尽管ZGC中的名字不叫这些）的 短暂停顿，而且这些停顿阶段所做的事情在目标上也是相类似的。与G1、Shenandoah不同的是，ZGC 的标记是在指针上而不是在对象上进行的，标记阶段会更新染色指针中的M arked 0、M arked 1标志 位。</li>
+<li>并发预备重分配（Concurrent Prep are for Relocate）：这个阶段需要根据特定的查询条件统计得出 本次收集过程要清理哪些Region，将这些Region组成重分配集（Relocation Set）。重分配集与G1收集器 的回收集（Collection Set）还是有区别的，ZGC划分Region的目的并非为了像G1那样做收益优先的增量回收。相反，ZGC每次回收都会扫描所有的Region，用范围更大的扫描成本换取省去G1中记忆集的 维护成本。因此，ZGC的重分配集只是决定了里面的存活对象会被重新复制到其他的Region中，里面 的Region会被释放，而并不能说回收行为就只是针对这个集合里面的Region进行，因为标记过程是针对 全堆的。此外，在JDK 12的ZGC中开始支持的类卸载以及弱引用的处理，也是在这个阶段中完成的。</li>
+<li>并发重分配（Concurrent Relocate）：重分配是ZGC执行过程中的核心阶段，这个过程要把重分 配集中的存活对象复制到新的Region上，并为重分配集中的每个Region维护一个转发表（Forward Table），记录从旧对象到新对象的转向关系。得益于染色指针的支持，ZGC收集器能仅从引用上就明 确得知一个对象是否处于重分配集之中，如果用户线程此时并发访问了位于重分配集中的对象，这次 访问将会被预置的内存屏障所截获，然后立即根据Region上的转发表记录将访问转发到新复制的对象 上，并同时修正更新该引用的值，使其直接指向新对象，ZGC将这种行为称为指针的“自愈”（Self- Healing）能力。这样做的好处是只有第一次访问旧对象会陷入转发，也就是只慢一次，对比 Shenandoah的Brooks转发指针，那是每次对象访问都必须付出的固定开销，简单地说就是每次都慢， 因此ZGC对用户程序的运行时负载要比Shenandoah来得更低一些。还有另外一个直接的好处是由于染 色指针的存在，一旦重分配集中某个Region的存活对象都复制完毕后，这个Region就可以立即释放用于 新对象的分配（但是转发表还得留着不能释放掉），哪怕堆中还有很多指向这个对象的未更新指针也 没有关系，这些旧指针一旦被使用，它们都是可以自愈的。</li>
+<li>并发重映射（Concurrent Remap ）：重映射所做的就是修正整个堆中指向重分配集中旧对象的所 有引用，这一点从目标角度看是与Shenandoah并发引用更新阶段一样的，但是ZGC的并发重映射并不 是一个必须要“迫切”去完成的任务，因为前面说过，即使是旧引用，它也是可以自愈的，最多只是第 一次使用时多一次转发和修正操作。重映射清理这些旧引用的主要目的是为了不变慢（还有清理结束 后可以释放转发表这样的附带收益），所以说这并不是很“迫切”。因此，ZGC很巧妙地把并发重映射 阶段要做的工作，合并到了下一次垃圾收集循环中的并发标记阶段里去完成，反正它们都是要遍历所 有对象的，这样合并就节省了一次遍历对象图[9]的开销。一旦所有指针都被修正之后，原来记录新旧 对象关系的转发表就可以释放掉了。</li>
+</ol>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:30.878Z" title="2025/5/16 11:11:30">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">8 分钟读完 (大约1246个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E4%BC%A0%E8%BE%93/">传输</a></p><div class="content"><p>[TOC]</p>
 <blockquote>
 <p>传输（Transport Security）<br>系统如何保证通过网络传输的信息无法被第三方窃听、篡改和冒充？</p>
@@ -180,73 +241,6 @@
 <li><p>比较上一步的结果和数据库储存的哈希值是否相同，如果相同那么密码正确，反之密码错误。</p>
  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">authentication = compare(result, server_hash) // yes</span><br></pre></td></tr></table></figure></li>
 </ol>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:34.767Z" title="2025/5/16 11:11:34">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">22 分钟读完 (大约3326个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E5%87%AD%E8%AF%81/">凭证（Credentials）</a></p><div class="content"><blockquote>
-<p>凭证（Credentials）<br>系统如何保证它与用户之间的承诺是双方当时真实意图的体现，是准确、完整且不可抵赖的？</p>
-</blockquote>
-<p>[TOC]</p>
-<h2 id="Cookie-Session"><a href="#Cookie-Session" class="headerlink" title="Cookie-Session"></a>Cookie-Session</h2><p>HTTP 协议是一种无状态的传输协议，我们希望 HTTP 能有一种手段，让服务器至少有办法能够区分出发送请求的用户是谁。</p>
-<p>为了实现这个目的，RFC 6265规范定义了 HTTP 的状态管理机制，在 HTTP 协议中增加了 Set-Cookie 指令，该指令的含义是以键值对的方式向客户端发送一组信息，此信息将在此后一段时间内的每次 HTTP 请求中，以名为 Cookie 的 Header 附带着重新发回给服务端，以便服务端区分来自不同客户端的请求。一个典型的 Set-Cookie 指令如下所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-Cookie: id=icyfenix; Expires=Wed, 21 Feb 2020 07:28:00 GMT; Secure; HttpOnly</span><br></pre></td></tr></table></figure>
-
-<p>收到该指令以后，客户端再对同一个域的请求中就会自动附带有键值对信息id&#x3D;icyfenix，譬如以下代码所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /index.html HTTP/2.0</span><br><span class="line">Host: icyfenix.cn</span><br><span class="line">Cookie: id=icyfenix</span><br></pre></td></tr></table></figure>
-
-<p>根据每次请求传到服务端的 Cookie，服务器就能分辨出请求来自于哪一个用户。由于 Cookie 是放在请求头上的，属于额外的传输负担，不应该携带过多的内容，而且放在 Cookie 中传输也并不安全，容易被中间人窃取或被篡改，所以通常是不会像例子中设置id&#x3D;icyfenix这样的明文信息。一般来说，系统会把状态信息保存在服务端，在 Cookie 里只传输的是一个无字面意义的、不重复的字符串，习惯上以sessionid或者jsessionid为名，服务器拿这个字符串为 Key，在内存中开辟一块空间，以 Key&#x2F;Entity 的结构存储每一个在线用户的上下文状态，再辅以一些超时自动清理之类的管理措施。这种服务端的状态管理机制就是今天大家非常熟悉的 Session，Cookie-Session 也是最传统但今天依然广泛应用于大量系统中的，由服务端与客户端联动来完成的状态管理机制。</p>
-<p>Cookie-Session 方案在“安全性”上其实是有一定先天优势的：状态信息都存储于服务器，只要依靠客户端的同源策略和 HTTPS 的传输层安全，保证 Cookie 中的键值不被窃取而出现被冒认身份的情况，就能完全规避掉上下文信息在传输过程中被泄漏和篡改的风险。</p>
-<p>Cookie-Session 方案的另一大优点是服务端有主动的状态管理能力，可根据自己的意愿随时修改、清除任意上下文信息，譬如很轻易就能实现强制某用户下线的这样功能。</p>
-<p>Session-Cookie 在单节点的单体服务环境中是最合适的方案，但当需要水平扩展服务能力，要部署集群时就开始面临麻烦了，由于 Session 存储在服务器的内存中，当服务器水平拓展成多节点时，设计者必须在以下三种方案中选择其一：</p>
-<ul>
-<li><p>牺牲集群的一致性（Consistency），让均衡器采用亲和式的负载均衡算法，譬如根据用户 IP 或者 Session 来分配节点，每一个特定用户发出的所有请求都一直被分配到其中某一个节点来提供服务，每个节点都不重复地保存着一部分用户的状态，如果这个节点崩溃了，里面的用户状态便完全丢失。</p>
-</li>
-<li><p>牺牲集群的可用性（Availability），让各个节点之间采用复制式的 Session，每一个节点中的 Session 变动都会发送到组播地址的其他服务器上，这样某个节点崩溃了，不会中断对某个用户的服务，但 Session 之间组播复制的同步代价高昂，节点越多时，同步成本越高。</p>
-</li>
-<li><p>牺牲集群的分区容忍性（Partition Tolerance），让普通的服务节点中不再保留状态，将上下文集中放在一个所有服务节点都能访问到的数据节点中进行存储。此时的矛盾是数据节点就成为了单点，一旦数据节点损坏或出现网络分区，整个集群都不再能提供服务。</p>
-</li>
-</ul>
-<h2 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h2><p>JWT（JSON Web Token）定义于RFC 7519标准之中，是目前广泛使用的一种令牌格式，尤其经常与 OAuth2 配合应用于分布式的、涉及多方的应用系统中。</p>
-<p><img src="/media/17369220368513/17369235252168.jpg"></p>
-<p>左边的字符串呈现了 JWT 令牌的本体。它最常见的使用方式是附在名为 Authorization 的 Header 发送给服务端，</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET /restful/products/1 HTTP/1.1</span><br><span class="line">Host: icyfenix.cn</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJpY3lmZW5peCIsInNjb3BlIjpbIkFMTCJdLCJleHAiOjE1ODQ5NDg5NDcsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiIsIlJPTEVfQURNSU4iXSwianRpIjoiOWQ3NzU4NmEtM2Y0Zi00Y2JiLTk5MjQtZmUyZjc3ZGZhMzNkIiwiY2xpZW50X2lkIjoiYm9va3N0b3JlX2Zyb250ZW5kIiwidXNlcm5hbWUiOiJpY3lmZW5peCJ9.539WMzbjv63wBtx4ytYYw_Fo1ECG_9vsgAn8bheflL8</span><br></pre></td></tr></table></figure>
-
-<p>右边的状态信息是对令牌使用 Base64URL 转码后得到的明文，请特别注意是明文，JWT 只解决防篡改的问题，并不解决防泄漏的问题，因此令牌默认是不加密的。令牌的组成部分：</p>
-<ol>
-<li><p>第一部分是令牌头（Header)</p>
-<p> 它描述了令牌的类型（统一为 typ:JWT）以及令牌签名的算法，示例中 HS256 为 HMAC SHA256 算法的缩写，其他各种系统支持的签名算法可以参考<a target="_blank" rel="noopener" href="https://jwt.io/%E7%BD%91%E7%AB%99%E6%89%80%E5%88%97%E3%80%82">https://jwt.io/网站所列。</a></p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;alg&quot;: &quot;HS256&quot;,</span><br><span class="line">  &quot;typ&quot;: &quot;JWT&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>令牌的第二部分是负载（Payload）</p>
-<p> 这是令牌真正需要向服务端传递的信息。针对认证问题，负载至少应该包含能够告知服务端“这个用户是谁”的信息，针对授权问题，令牌至少应该包含能够告知服务端“这个用户拥有什么角色&#x2F;权限”的信息。JWT 的负载部分是可以完全自定义的，根据具体要解决的问题不同，设计自己所需要的信息，只是总容量不能太大，毕竟要受到 HTTP Header 大小的限制。</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;username&quot;: &quot;icyfenix&quot;,</span><br><span class="line">  &quot;authorities&quot;: [</span><br><span class="line">    &quot;ROLE_USER&quot;,</span><br><span class="line">    &quot;ROLE_ADMIN&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;scope&quot;: [</span><br><span class="line">    &quot;ALL&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;exp&quot;: 1584948947,</span><br><span class="line">  &quot;jti&quot;: &quot;9d77586a-3f4f-4cbb-9924-fe2f77dfa33d&quot;,</span><br><span class="line">  &quot;client_id&quot;: &quot;bookstore_frontend&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p> JWT 在 RFC 7519 中推荐（非强制约束）了七项声明名称（Claim Name），如有需要用到这些内容，建议字段名与官方的保持一致：</p>
-<ul>
-<li>iss（Issuer）：签发人。</li>
-<li>exp（Expiration Time）：令牌过期时间。</li>
-<li>sub（Subject）：主题。</li>
-<li>aud （Audience）：令牌受众。</li>
-<li>nbf （Not Before）：令牌生效时间。</li>
-<li>iat （Issued At）：令牌签发时间。</li>
-<li>jti （JWT ID）：令牌编号。</li>
-</ul>
-</li>
-<li><p>令牌的第三部分是签名（Signature）</p>
-<p> 令牌的第三部分是签名（Signature），签名的意思是：使用在对象头中公开的特定签名算法，通过特定的密钥（Secret，由服务器进行保密，不能公开）对前面两部分内容进行加密计算</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload) , secret)</span><br></pre></td></tr></table></figure>
-<p> 签名的意义在于确保负载中的信息是可信的、没有被篡改的，也没有在传输过程中丢失任何信息。因为被签名的内容哪怕发生了一个字节的变动，也会导致整个签名发生显著变化。此外，由于签名这件事情只能由认证授权服务器完成（只有它知道 Secret），任何人都无法在篡改后重新计算出合法的签名值，所以服务端才能够完全信任客户端传上来的 JWT 中的负载信息。</p>
-</li>
-</ol>
-<p>JWT 令牌是多方系统中一种优秀的凭证载体，它不需要任何一个服务节点保留任何一点状态信息，就能够保障认证服务与用户之间的承诺是双方当时真实意图的体现，是准确、完整、不可篡改、且不可抵赖的。同时，由于 JWT 本身可以携带少量信息，这十分有利于 RESTful API 的设计，能够较容易地做成无状态服务，在做水平扩展时就不需要像前面 Cookie-Session 方案那样考虑如何部署的问题。现实中也确实有一些项目直接采用 JWT 来承载上下文来实现完全无状态的服务端，这能获得任意加入或移除服务节点的巨大便利，天然具有完美的水平扩缩能力。尽管大型系统中只使用 JWT 来维护上下文状态，服务端完全不持有状态是不太现实的，不过将热点的服务单独抽离出来做成无状态，仍是一种有效提升系统吞吐能力的架构技巧。但是，JWT 也并非没有缺点的完美方案，它存在着以下几个经常被提及的缺点：</p>
-<ul>
-<li><p>令牌难以主动失效：JWT 令牌一旦签发，理论上就和认证服务器再没有什么瓜葛了，在到期之前就会始终有效，除非服务器部署额外的逻辑去处理失效问题，这对某些管理功能的实现是很不利的。譬如一种颇为常见的需求是：要求一个用户只能在一台设备上登录，在 B 设备登录后，之前已经登录过的 A 设备就应该自动退出。如果采用 JWT，就必须设计一个“黑名单”的额外的逻辑，用来把要主动失效的令牌集中存储起来，而无论这个黑名单是实现在 Session、Redis 或者数据库中，都会让服务退化成有状态服务，降低了 JWT 本身的价值，但黑名单在使用 JWT 时依然是很常见的做法，需要维护的黑名单一般是很小的状态量，许多场景中还是有存在价值的</p>
-</li>
-<li><p>相对更容易遭受重放攻击：首先说明 Cookie-Session 也是有重放攻击问题的，只是因为 Session 中的数据控制在服务端手上，应对重放攻击会相对主动一些。要在 JWT 层面解决重放攻击需要付出比较大的代价，无论是加入全局序列号（HTTPS 协议的思路）、Nonce 字符串（HTTP Digest 验证的思路）、挑战应答码（当下网银动态令牌的思路）、还是缩短令牌有效期强制频繁刷新令牌，在真正应用起来时都很麻烦。真要处理重放攻击，建议的解决方案是在信道层次（譬如启用 HTTPS）上解决，而不提倡在服务层次（譬如在令牌或接口其他参数上增加额外逻辑）上解决。</p>
-</li>
-<li><p>只能携带相当有限的数据：HTTP 协议并没有强制约束 Header 的最大长度，但是，各种服务器、浏览器都会有自己的约束，譬如 Tomcat 就要求 Header 最大不超过 8KB，而在 Nginx 中则默认为 4KB，因此在令牌中存储过多的数据不仅耗费传输带宽，还有额外的出错风险。</p>
-</li>
-<li><p>必须考虑令牌在客户端如何存储：严谨地说，这个并不是 JWT 的问题而是系统设计的问题。如果授权之后，操作完关掉浏览器就结束了，那把令牌放到内存里面，压根不考虑持久化才是最理想的方案。但并不是谁都能忍受一个网站关闭之后下次就一定强制要重新登录的。这样的话，想想客户端该把令牌存放到哪里？Cookie？localStorage？Indexed DB？它们都有泄漏的可能，而令牌一旦泄漏，别人就可以冒充用户的身份做任何事情。</p>
-</li>
-<li><p>无状态也不总是好的：这个其实不也是 JWT 的问题。如果不能想像无状态会有什么不好的话，我给你提个需求：请基于无状态 JWT 的方案，做一个在线用户实时统计功能。兄弟，难搞哦。</p>
-</li>
-</ul>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:42.877Z" title="2025/5/16 11:11:42">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">23 分钟读完 (大约3384个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E6%8E%88%E6%9D%83/">授权（ Authorization）</a></p><div class="content"><p>[TOC]</p>
 <blockquote>
 <p>授权（ Authorization）<br>    系统如何控制一个用户该看到哪些数据、能操作哪些功能？</p>
@@ -328,6 +322,73 @@
 <h3 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h3><p> 客户端模式是指第三方应用（行文一致考虑，还是继续沿用这个称呼）以自己的名义，向授权服务器申请资源许可。此模式通常用于管理操作或者自动处理类型的场景中。</p>
 <p> <img src="/media/17369093589979/17369207278512.jpg"></p>
 <p>微服务架构并不提倡同一个系统的各服务间有默认的信任关系，所以服务之间调用也需要先进行认证授权，然后才能通信。此时，客户端模式便是一种常用的服务间认证授权的解决方案。</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:34.767Z" title="2025/5/16 11:11:34">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">22 分钟读完 (大约3326个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E5%87%AD%E8%AF%81/">凭证（Credentials）</a></p><div class="content"><blockquote>
+<p>凭证（Credentials）<br>系统如何保证它与用户之间的承诺是双方当时真实意图的体现，是准确、完整且不可抵赖的？</p>
+</blockquote>
+<p>[TOC]</p>
+<h2 id="Cookie-Session"><a href="#Cookie-Session" class="headerlink" title="Cookie-Session"></a>Cookie-Session</h2><p>HTTP 协议是一种无状态的传输协议，我们希望 HTTP 能有一种手段，让服务器至少有办法能够区分出发送请求的用户是谁。</p>
+<p>为了实现这个目的，RFC 6265规范定义了 HTTP 的状态管理机制，在 HTTP 协议中增加了 Set-Cookie 指令，该指令的含义是以键值对的方式向客户端发送一组信息，此信息将在此后一段时间内的每次 HTTP 请求中，以名为 Cookie 的 Header 附带着重新发回给服务端，以便服务端区分来自不同客户端的请求。一个典型的 Set-Cookie 指令如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-Cookie: id=icyfenix; Expires=Wed, 21 Feb 2020 07:28:00 GMT; Secure; HttpOnly</span><br></pre></td></tr></table></figure>
+
+<p>收到该指令以后，客户端再对同一个域的请求中就会自动附带有键值对信息id&#x3D;icyfenix，譬如以下代码所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /index.html HTTP/2.0</span><br><span class="line">Host: icyfenix.cn</span><br><span class="line">Cookie: id=icyfenix</span><br></pre></td></tr></table></figure>
+
+<p>根据每次请求传到服务端的 Cookie，服务器就能分辨出请求来自于哪一个用户。由于 Cookie 是放在请求头上的，属于额外的传输负担，不应该携带过多的内容，而且放在 Cookie 中传输也并不安全，容易被中间人窃取或被篡改，所以通常是不会像例子中设置id&#x3D;icyfenix这样的明文信息。一般来说，系统会把状态信息保存在服务端，在 Cookie 里只传输的是一个无字面意义的、不重复的字符串，习惯上以sessionid或者jsessionid为名，服务器拿这个字符串为 Key，在内存中开辟一块空间，以 Key&#x2F;Entity 的结构存储每一个在线用户的上下文状态，再辅以一些超时自动清理之类的管理措施。这种服务端的状态管理机制就是今天大家非常熟悉的 Session，Cookie-Session 也是最传统但今天依然广泛应用于大量系统中的，由服务端与客户端联动来完成的状态管理机制。</p>
+<p>Cookie-Session 方案在“安全性”上其实是有一定先天优势的：状态信息都存储于服务器，只要依靠客户端的同源策略和 HTTPS 的传输层安全，保证 Cookie 中的键值不被窃取而出现被冒认身份的情况，就能完全规避掉上下文信息在传输过程中被泄漏和篡改的风险。</p>
+<p>Cookie-Session 方案的另一大优点是服务端有主动的状态管理能力，可根据自己的意愿随时修改、清除任意上下文信息，譬如很轻易就能实现强制某用户下线的这样功能。</p>
+<p>Session-Cookie 在单节点的单体服务环境中是最合适的方案，但当需要水平扩展服务能力，要部署集群时就开始面临麻烦了，由于 Session 存储在服务器的内存中，当服务器水平拓展成多节点时，设计者必须在以下三种方案中选择其一：</p>
+<ul>
+<li><p>牺牲集群的一致性（Consistency），让均衡器采用亲和式的负载均衡算法，譬如根据用户 IP 或者 Session 来分配节点，每一个特定用户发出的所有请求都一直被分配到其中某一个节点来提供服务，每个节点都不重复地保存着一部分用户的状态，如果这个节点崩溃了，里面的用户状态便完全丢失。</p>
+</li>
+<li><p>牺牲集群的可用性（Availability），让各个节点之间采用复制式的 Session，每一个节点中的 Session 变动都会发送到组播地址的其他服务器上，这样某个节点崩溃了，不会中断对某个用户的服务，但 Session 之间组播复制的同步代价高昂，节点越多时，同步成本越高。</p>
+</li>
+<li><p>牺牲集群的分区容忍性（Partition Tolerance），让普通的服务节点中不再保留状态，将上下文集中放在一个所有服务节点都能访问到的数据节点中进行存储。此时的矛盾是数据节点就成为了单点，一旦数据节点损坏或出现网络分区，整个集群都不再能提供服务。</p>
+</li>
+</ul>
+<h2 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h2><p>JWT（JSON Web Token）定义于RFC 7519标准之中，是目前广泛使用的一种令牌格式，尤其经常与 OAuth2 配合应用于分布式的、涉及多方的应用系统中。</p>
+<p><img src="/media/17369220368513/17369235252168.jpg"></p>
+<p>左边的字符串呈现了 JWT 令牌的本体。它最常见的使用方式是附在名为 Authorization 的 Header 发送给服务端，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET /restful/products/1 HTTP/1.1</span><br><span class="line">Host: icyfenix.cn</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJpY3lmZW5peCIsInNjb3BlIjpbIkFMTCJdLCJleHAiOjE1ODQ5NDg5NDcsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiIsIlJPTEVfQURNSU4iXSwianRpIjoiOWQ3NzU4NmEtM2Y0Zi00Y2JiLTk5MjQtZmUyZjc3ZGZhMzNkIiwiY2xpZW50X2lkIjoiYm9va3N0b3JlX2Zyb250ZW5kIiwidXNlcm5hbWUiOiJpY3lmZW5peCJ9.539WMzbjv63wBtx4ytYYw_Fo1ECG_9vsgAn8bheflL8</span><br></pre></td></tr></table></figure>
+
+<p>右边的状态信息是对令牌使用 Base64URL 转码后得到的明文，请特别注意是明文，JWT 只解决防篡改的问题，并不解决防泄漏的问题，因此令牌默认是不加密的。令牌的组成部分：</p>
+<ol>
+<li><p>第一部分是令牌头（Header)</p>
+<p> 它描述了令牌的类型（统一为 typ:JWT）以及令牌签名的算法，示例中 HS256 为 HMAC SHA256 算法的缩写，其他各种系统支持的签名算法可以参考<a target="_blank" rel="noopener" href="https://jwt.io/%E7%BD%91%E7%AB%99%E6%89%80%E5%88%97%E3%80%82">https://jwt.io/网站所列。</a></p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;alg&quot;: &quot;HS256&quot;,</span><br><span class="line">  &quot;typ&quot;: &quot;JWT&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>令牌的第二部分是负载（Payload）</p>
+<p> 这是令牌真正需要向服务端传递的信息。针对认证问题，负载至少应该包含能够告知服务端“这个用户是谁”的信息，针对授权问题，令牌至少应该包含能够告知服务端“这个用户拥有什么角色&#x2F;权限”的信息。JWT 的负载部分是可以完全自定义的，根据具体要解决的问题不同，设计自己所需要的信息，只是总容量不能太大，毕竟要受到 HTTP Header 大小的限制。</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;username&quot;: &quot;icyfenix&quot;,</span><br><span class="line">  &quot;authorities&quot;: [</span><br><span class="line">    &quot;ROLE_USER&quot;,</span><br><span class="line">    &quot;ROLE_ADMIN&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;scope&quot;: [</span><br><span class="line">    &quot;ALL&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;exp&quot;: 1584948947,</span><br><span class="line">  &quot;jti&quot;: &quot;9d77586a-3f4f-4cbb-9924-fe2f77dfa33d&quot;,</span><br><span class="line">  &quot;client_id&quot;: &quot;bookstore_frontend&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> JWT 在 RFC 7519 中推荐（非强制约束）了七项声明名称（Claim Name），如有需要用到这些内容，建议字段名与官方的保持一致：</p>
+<ul>
+<li>iss（Issuer）：签发人。</li>
+<li>exp（Expiration Time）：令牌过期时间。</li>
+<li>sub（Subject）：主题。</li>
+<li>aud （Audience）：令牌受众。</li>
+<li>nbf （Not Before）：令牌生效时间。</li>
+<li>iat （Issued At）：令牌签发时间。</li>
+<li>jti （JWT ID）：令牌编号。</li>
+</ul>
+</li>
+<li><p>令牌的第三部分是签名（Signature）</p>
+<p> 令牌的第三部分是签名（Signature），签名的意思是：使用在对象头中公开的特定签名算法，通过特定的密钥（Secret，由服务器进行保密，不能公开）对前面两部分内容进行加密计算</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload) , secret)</span><br></pre></td></tr></table></figure>
+<p> 签名的意义在于确保负载中的信息是可信的、没有被篡改的，也没有在传输过程中丢失任何信息。因为被签名的内容哪怕发生了一个字节的变动，也会导致整个签名发生显著变化。此外，由于签名这件事情只能由认证授权服务器完成（只有它知道 Secret），任何人都无法在篡改后重新计算出合法的签名值，所以服务端才能够完全信任客户端传上来的 JWT 中的负载信息。</p>
+</li>
+</ol>
+<p>JWT 令牌是多方系统中一种优秀的凭证载体，它不需要任何一个服务节点保留任何一点状态信息，就能够保障认证服务与用户之间的承诺是双方当时真实意图的体现，是准确、完整、不可篡改、且不可抵赖的。同时，由于 JWT 本身可以携带少量信息，这十分有利于 RESTful API 的设计，能够较容易地做成无状态服务，在做水平扩展时就不需要像前面 Cookie-Session 方案那样考虑如何部署的问题。现实中也确实有一些项目直接采用 JWT 来承载上下文来实现完全无状态的服务端，这能获得任意加入或移除服务节点的巨大便利，天然具有完美的水平扩缩能力。尽管大型系统中只使用 JWT 来维护上下文状态，服务端完全不持有状态是不太现实的，不过将热点的服务单独抽离出来做成无状态，仍是一种有效提升系统吞吐能力的架构技巧。但是，JWT 也并非没有缺点的完美方案，它存在着以下几个经常被提及的缺点：</p>
+<ul>
+<li><p>令牌难以主动失效：JWT 令牌一旦签发，理论上就和认证服务器再没有什么瓜葛了，在到期之前就会始终有效，除非服务器部署额外的逻辑去处理失效问题，这对某些管理功能的实现是很不利的。譬如一种颇为常见的需求是：要求一个用户只能在一台设备上登录，在 B 设备登录后，之前已经登录过的 A 设备就应该自动退出。如果采用 JWT，就必须设计一个“黑名单”的额外的逻辑，用来把要主动失效的令牌集中存储起来，而无论这个黑名单是实现在 Session、Redis 或者数据库中，都会让服务退化成有状态服务，降低了 JWT 本身的价值，但黑名单在使用 JWT 时依然是很常见的做法，需要维护的黑名单一般是很小的状态量，许多场景中还是有存在价值的</p>
+</li>
+<li><p>相对更容易遭受重放攻击：首先说明 Cookie-Session 也是有重放攻击问题的，只是因为 Session 中的数据控制在服务端手上，应对重放攻击会相对主动一些。要在 JWT 层面解决重放攻击需要付出比较大的代价，无论是加入全局序列号（HTTPS 协议的思路）、Nonce 字符串（HTTP Digest 验证的思路）、挑战应答码（当下网银动态令牌的思路）、还是缩短令牌有效期强制频繁刷新令牌，在真正应用起来时都很麻烦。真要处理重放攻击，建议的解决方案是在信道层次（譬如启用 HTTPS）上解决，而不提倡在服务层次（譬如在令牌或接口其他参数上增加额外逻辑）上解决。</p>
+</li>
+<li><p>只能携带相当有限的数据：HTTP 协议并没有强制约束 Header 的最大长度，但是，各种服务器、浏览器都会有自己的约束，譬如 Tomcat 就要求 Header 最大不超过 8KB，而在 Nginx 中则默认为 4KB，因此在令牌中存储过多的数据不仅耗费传输带宽，还有额外的出错风险。</p>
+</li>
+<li><p>必须考虑令牌在客户端如何存储：严谨地说，这个并不是 JWT 的问题而是系统设计的问题。如果授权之后，操作完关掉浏览器就结束了，那把令牌放到内存里面，压根不考虑持久化才是最理想的方案。但并不是谁都能忍受一个网站关闭之后下次就一定强制要重新登录的。这样的话，想想客户端该把令牌存放到哪里？Cookie？localStorage？Indexed DB？它们都有泄漏的可能，而令牌一旦泄漏，别人就可以冒充用户的身份做任何事情。</p>
+</li>
+<li><p>无状态也不总是好的：这个其实不也是 JWT 的问题。如果不能想像无状态会有什么不好的话，我给你提个需求：请基于无状态 JWT 的方案，做一个在线用户实时统计功能。兄弟，难搞哦。</p>
+</li>
+</ul>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:11:37.410Z" title="2025/5/16 11:11:37">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">16 分钟读完 (大约2376个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/%E8%AE%A4%E8%AF%81/">认证（Authentication）</a></p><div class="content"><p>[TOC]</p>
 <blockquote>
 <p>认证（Authentication）<br>系统如何正确分辨出操作用户的真实身份？</p>
@@ -407,7 +468,12 @@
 </ol>
 <p>WebAuthn 采用非对称加密的公钥、私钥替代传统的密码，这是非常理想的认证方案，私钥是保密的，只有验证器需要知道它，连用户本人都不需要知道，也就没有人为泄漏的可能；公钥是公开的，可以被任何人看到或存储。公钥可用于验证私钥生成的签名，但不能用来签名，除了得知私钥外，没有其他途径能够生成可被公钥验证为有效的签名，这样服务器就可以通过公钥是否能够解密来判断最终用户的身份是否合法。</p>
 <p>WebAuthn 还一揽子地解决了传统密码在网络传输上的风险，无论密码是否客户端进行加密、如何加密，对防御中间人攻击来说都是没有意义的。更值得夸赞的是 WebAuthn 为登录过程带来极大的便捷性，不仅注册和验证的用户体验十分优秀，而且彻底避免了用户在一个网站上泄漏密码，所有使用相同密码的网站都受到攻击的问题，<strong>这个优点使得用户无须再为每个网站想不同的密码</strong>。</p>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:15.836Z" title="2025/5/16 11:12:15">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">16 分钟读完 (大约2378个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AE%B9%E5%88%86%E5%8F%91%E7%BD%91%E7%BB%9C%EF%BC%88CDN%EF%BC%89/">内容分发网络（CDN）</a></p><div class="content"><p>[TOC]</p>
+</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:02.994Z" title="2025/5/16 11:12:02">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">几秒读完 (大约90个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/%E4%BC%A0%E8%BE%93%E9%93%BE%E8%B7%AF%E4%BC%98%E5%8C%96/">传输链路优化</a></p><div class="content"><p>[TOC]</p>
+<blockquote>
+<p>传输链路优化（Transmission Optimization）<br>今天的传输链路优化原则，在若干年后的未来再回头看它们时，其中多数已经成了奇技淫巧，有些甚至成了反模式。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://icyfenix.cn/architect-perspective/general-architecture/diversion-system/transmission-optimization.html">https://icyfenix.cn/architect-perspective/general-architecture/diversion-system/transmission-optimization.html</a></p>
+<h2 id="连接数优化"><a href="#连接数优化" class="headerlink" title="连接数优化"></a>连接数优化</h2><h2 id="传输压缩"><a href="#传输压缩" class="headerlink" title="传输压缩"></a>传输压缩</h2><h2 id="快速-UDP-网络连接"><a href="#快速-UDP-网络连接" class="headerlink" title="快速 UDP 网络连接"></a>快速 UDP 网络连接</h2></div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:15.836Z" title="2025/5/16 11:12:15">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">16 分钟读完 (大约2378个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AE%B9%E5%88%86%E5%8F%91%E7%BD%91%E7%BB%9C%EF%BC%88CDN%EF%BC%89/">内容分发网络（CDN）</a></p><div class="content"><p>[TOC]</p>
 <p>Content Distribution Network</p>
 <p>如果把某个互联网系统比喻为一家企业，那内容分发网络就是它遍布世界各地的分支销售机构，现在有客户要买一块 CPU，那么订机票飞到美国加州 Intel 总部肯定是不合适的，到本地电脑城找个装机铺才是通常的做法，在此场景中，内容分发网络就相当于电脑城里的本地经销商。</p>
 <p>仅从网络传输的角度看，一个互联网系统的速度取决于以下四点因素：</p>
@@ -455,58 +521,6 @@
 <li>访问控制：CDN 可以实现 IP 黑&#x2F;白名单功能，根据不同的来访 IP 提供不同的响应结果，根据 IP 的访问流量来实现 QoS 控制、根据 HTTP 的 Referer 来实现防盗链，等等。</li>
 <li>注入功能：CDN 可以在不修改源站代码的前提下，为源站注入各种功能</li>
 </ul>
-</div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:11.795Z" title="2025/5/16 11:12:11">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">22 分钟读完 (大约3366个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%BC%93%E5%AD%98/">客户端缓存（Client Cache）</a></p><div class="content"><p>[TOC]</p>
-<blockquote>
-<p>客户端缓存（Client Cache）<br>HTTP 协议的无状态性决定了它必须依靠客户端缓存来解决网络传输效率上的缺陷。</p>
-</blockquote>
-<h2 id="状态缓存"><a href="#状态缓存" class="headerlink" title="状态缓存"></a>状态缓存</h2><p>HTTP 缓存中，状态缓存是指不经过服务器，客户端直接根据缓存信息对目标网站的状态判断，以前只有 301&#x2F;Moved Permanently（永久重定向）这一种；后来在RFC6797中增加了HSTS（HTTP Strict Transport Security）机制，用于避免依赖 301&#x2F;302 跳转 HTTPS 时可能产生的降级中间人劫持。</p>
-<h2 id="强制缓存"><a href="#强制缓存" class="headerlink" title="强制缓存"></a>强制缓存</h2><p>HTTP 的强制缓存对一致性处理的策略就如它的名字一样，十分直接：<strong>假设在某个时点到来以前，譬如收到响应后的 10 分钟内，资源的内容和状态一定不会被改变</strong>，<strong>因此客户端可以无须经过任何请求，在该时点前一直持有和使用该资源的本地缓存副本</strong>。</p>
-<p>根据约定，<strong>强制缓存在浏览器的地址输入、页面链接跳转、新开窗口、前进和后退中均可生效，但在用户主动刷新页面时应当自动失效</strong>。</p>
-<p>HTTP 协议中设有以下两类 Header 实现强制缓存。</p>
-<ul>
-<li><p>Expires：Expires 是 HTTP&#x2F;1.0 协议中开始提供的 Header，后面跟随一个截至时间参数。当服务器返回某个资源时带有该 Header 的话，意味着<strong>服务器承诺截止时间之前资源不会发生变动，浏览器可直接缓存该数据，不再重新发请求</strong>。<br>  示例：</p>
-  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Expires: Wed, 8 Apr 2020 07:28:00 GMT</span><br></pre></td></tr></table></figure>
-<p>  Expires 是 HTTP 协议最初版本中提供的缓存机制，设计非常直观易懂，但考虑得并不够周全，它至少存在以下显而易见的问题：</p>
-<ul>
-<li>受限于客户端的本地时间。譬如，在收到响应后，客户端修改了本地时间，将时间前后调整几分钟，就可能会造成缓存提前失效或超期持有。</li>
-<li>无法处理涉及到用户身份的私有资源，譬如，某些资源被登录用户缓存在自己的浏览器上是合理的，但如果被代理服务器或者内容分发网络缓存起来，则可能被其他未认证的用户所获取。</li>
-<li>无法描述“不缓存”的语义。譬如，浏览器为了提高性能，往往会自动在当次会话中缓存某些 MIME 类型的资源，在 HTTP&#x2F;1.0 的服务器中就缺乏手段强制浏览器不允许缓存某个资源。以前为了实现这类功能，通常不得不使用脚本，或者手工在资源后面增加时间戳（譬如如“xx.js?t&#x3D;1586359920”、“xx.jpg?t&#x3D;1586359350”）来保证每次资源都会重新获取。</li>
-<li>关于“不缓存”的语义，在 HTTP&#x2F;1.0 中其实预留了“Pragma: no-cache”来表达，但 Pragma 参数在 HTTP&#x2F;1.0 中并没有确切描述其具体行为，随后就被 HTTP&#x2F;1.1 中出现过的 Cache-Control 所替代，现在，尽管主流浏览器通常都会支持 Pragma，但行为仍然是不确定的，实际并没有什么使用价值。</li>
-</ul>
-</li>
-<li><p>Cache-Control：Cache-Control 是 HTTP&#x2F;1.1 协议中定义的强制缓存 Header，它的语义比起 Expires 来说就丰富了很多，如果 Cache-Control 和 Expires 同时存在，并且语义存在冲突（譬如 Expires 与 max-age &#x2F; s-maxage 冲突）的话，规定必须以 Cache-Control 为准。Cache-Control 的使用示例如下：</p>
-  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Cache-Control: max-age=600</span><br></pre></td></tr></table></figure>
-<p>  Cache-Control 在客户端的请求 Header 或服务器的响应 Header 中都可以存在，它定义了一系列的参数，且允许自行扩展（即不在标准 RFC 协议中，由浏览器自行支持的参数），其标准的参数主要包括有：</p>
-<ul>
-<li>max-age和s-maxage：max-age 后面跟随一个以秒为单位的数字，表明相对于请求时间（在 Date Header 中会注明请求时间）多少秒以内缓存是有效的，资源不需要重新从服务器中获取。相对时间避免了 Expires 中采用的绝对时间可能受客户端时钟影响的问题。s-maxage 中的“s”是“Share”的缩写，意味“共享缓存”的有效时间，即允许被 CDN、代理等持有的缓存有效时间，用于提示 CDN 这类服务器应在何时让缓存失效。</li>
-<li>public和private：指明是否涉及到用户身份的私有资源，如果是 public，则可以被代理、CDN 等缓存，如果是 private，则只能由用户的客户端进行私有缓存。</li>
-<li>no-cache和no-store：no-cache 指明该资源不应该被缓存，哪怕是同一个会话中对同一个 URL 地址的请求，也必须从服务端获取，令强制缓存完全失效，但此时下一节中的协商缓存机制依然是生效的；no-store 不强制会话中相同 URL 资源的重复获取，但禁止浏览器、CDN 等以任何形式保存该资源。</li>
-<li>no-transform：禁止资源被任何形式地修改。譬如，某些 CDN、透明代理支持自动 GZip 压缩图片或文本，以提升网络性能，而 no-transform 就禁止了这样的行为，它要求 Content-Encoding、Content-Range、Content-Type 均不允许进行任何形式的修改。</li>
-<li>min-fresh和only-if-cached：这两个参数是仅用于客户端的请求 Header。min-fresh 后续跟随一个以秒为单位的数字，用于建议服务器能返回一个不少于该时间的缓存资源（即包含 max-age 且不少于 min-fresh 的数字）。only-if-cached 表示客户端要求不必给它发送资源的具体内容，此时客户端就仅能使用事先缓存的资源来进行响应，若缓存不能命中，就直接返回 503&#x2F;Service Unavailable 错误。</li>
-<li>must-revalidate和proxy-revalidate：must-revalidate 表示在资源过期后，一定需要从服务器中进行获取，即超过了 max-age 的时间后，就等同于 no-cache 的行为，proxy-revalidate 用于提示代理、CDN 等设备资源过期后的缓存行为，除对象不同外，语义与 must-revalidate 完全一致。</li>
-</ul>
-</li>
-</ul>
-<h2 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h2><p>强制缓存是基于时效性的，但无论是人还是服务器，其实多数情况下都并没有什么把握去承诺某项资源多久不会发生变化。另外一种基于变化检测的缓存机制，在一致性上会有比强制缓存更好的表现，但需要一次变化检测的交互开销，性能上就会略差一些，这种基于检测的缓存机制，通常被称为“协商缓存”。另外，应注意在 HTTP 中协商缓存与强制缓存并没有互斥性，这两套机制是并行工作的，譬如，当强制缓存存在时，直接从强制缓存中返回资源，无须进行变动检查；而当强制缓存超过时效，或者被禁止（no-cache &#x2F; must-revalidate），协商缓存仍可以正常地工作。</p>
-<p>协商缓存有两种变动检查机制，分别是根据资源的修改时间进行检查，以及根据资源唯一标识是否发生变化来进行检查，它们都是靠一组成对出现的请求、响应 Header 来实现的：</p>
-<ul>
-<li><p>Last-Modified 和 If-Modified-Since：Last-Modified 是服务器的响应 Header，用于告诉客户端这个资源的最后修改时间。对于带有这个 Header 的资源，当客户端需要再次请求时，会通过 If-Modified-Since 把之前收到的资源最后修改时间发送回服务端。</p>
-<p>  如果此时服务端发现资源在该时间后没有被修改过，就只要返回一个 304&#x2F;Not Modified 的响应即可，无须附带消息体，达到节省流量的目的，如下所示：</p>
-  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 304 Not Modified</span><br><span class="line">Cache-Control: public, max-age=600</span><br><span class="line">Last-Modified: Wed, 8 Apr 2020 15:31:30 GMT</span><br></pre></td></tr></table></figure>
-
-<p>  如果此时服务端发现资源在该时间之后有变动，就会返回 200&#x2F;OK 的完整响应，在消息体中包含最新的资源，如下所示：</p>
-  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Cache-Control: public, max-age=600</span><br><span class="line">Last-Modified: Wed, 8 Apr 2020 15:31:30 GMT</span><br><span class="line">Content</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Etag 和 If-None-Match：Etag 是服务器的响应 Header，用于告诉客户端这个资源的唯一标识。HTTP 服务器可以根据自己的意愿来选择如何生成这个标识，譬如 Apache 服务器的 Etag 值默认是对文件的索引节点（INode），大小和最后修改时间进行哈希计算后得到的。对于带有这个 Header 的资源，当客户端需要再次请求时，会通过 If-None-Match 把之前收到的资源唯一标识发送回服务端。</p>
-<p>  如果此时服务端计算后发现资源的唯一标识与上传回来的一致，说明资源没有被修改过，就只要返回一个 304&#x2F;Not Modified 的响应即可，无须附带消息体，达到节省流量的目的，如下所示：</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 304 Not Modified</span><br><span class="line">Cache-Control: public, max-age=600</span><br><span class="line">ETag: &quot;28c3f612-ceb0-4ddc-ae35-791ca840c5fa&quot;</span><br></pre></td></tr></table></figure>
-<p>  如果此时服务端发现资源的唯一标识有变动，就会返回 200&#x2F;OK 的完整响应，在消息体中包含最新的资源，如下所示：</p>
- <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Cache-Control: public, max-age=600</span><br><span class="line">ETag: &quot;28c3f612-ceb0-4ddc-ae35-791ca840c5fa&quot;</span><br><span class="line">Content</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p>Etag 是 HTTP 中一致性最强的缓存机制，譬如，Last-Modified 标注的最后修改只能精确到秒级，如果某些文件在 1 秒钟以内，被修改多次的话，它将不能准确标注文件的修改时间；又或者如果某些文件会被定期生成，可能内容并没有任何变化，但 Last-Modified 却改变了，导致文件无法有效使用缓存，这些情况 Last-Modified 都有可能产生资源一致性问题，只能使用 Etag 解决。</p>
-<p>Etag 却又是 HTTP 中性能最差的缓存机制，体现在每次请求时，服务端都必须对资源进行哈希计算，这比起简单获取一下修改时间，开销要大了很多。Etag 和 Last-Modified 是允许一起使用的，服务器会优先验证 Etag，在 Etag 一致的情况下，再去对比 Last-Modified，这是为了防止有一些 HTTP 服务器未将文件修改日期纳入哈希范围内。</p>
-<p>到这里为止，HTTP 的协商缓存机制已经能很好地处理通过 URL 获取单个资源的场景，为什么要强调“单个资源”呢？在 HTTP 协议的设计中，一个 URL 地址是有可能能够提供多份不同版本的资源，譬如，一段文字的不同语言版本，一个文件的不同编码格式版本，一份数据的不同压缩方式版本，等等。因此针对请求的缓存机制，也必须能够提供对应的支持。为此，HTTP 协议设计了以 Accept*（Accept、Accept-Language、Accept-Charset、Accept-Encoding）开头的一套请求 Header 和对应的以 Content-*（Content-Language、Content-Type、Content-Encoding）开头的响应 Header，这些 Headers 被称为 HTTP 的内容协商机制。与之对应的，对于一个 URL 能够获取多个资源的场景中，缓存也同样也需要有明确的标识来获知根据什么内容来对同一个 URL 返回给用户正确的资源。这个就是 Vary Header 的作用，Vary 后面应该跟随一组其他 Header 的名字，譬如：<br>   <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Vary: Accept, User-Agent</span><br></pre></td></tr></table></figure><br>以上响应的含义是应该根据 MIME 类型和浏览器类型来缓存资源，获取资源时也需要根据请求 Header 中对应的字段来筛选出适合的资源版本。</p>
-<p>根据约定，协商缓存不仅在浏览器的地址输入、页面链接跳转、新开窗口、前进、后退中生效，而且在用户主动刷新页面（F5）时也同样是生效的，只有用户强制刷新（Ctrl+F5）或者明确禁用缓存（譬如在 DevTools 中设定）时才会失效，此时客户端向服务端发出的请求会自动带有“Cache-Control: no-cache”。</p>
 </div></article></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2024-09-01T04:00:00.000Z" title="2024/9/1 12:00:00">2024-09-01</time>发表</span><span class="level-item"><time dateTime="2025-05-16T03:12:23.287Z" title="2025/5/16 11:12:23">2025-05-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></span><span class="level-item">9 分钟读完 (大约1282个字)</span></div></div><p class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2024/09/01/%E5%88%86%E5%B8%83%E5%BC%8F/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/">域名缓存（DNS Lookup）</a></p><div class="content"><blockquote>
 <p>域名缓存（DNS Lookup）<br>DNS 也许是全世界最大、使用最频繁的信息查询系统，如果没有适当的分流机制，DNS 将会成为整个网络的瓶颈。</p>
 </blockquote>
