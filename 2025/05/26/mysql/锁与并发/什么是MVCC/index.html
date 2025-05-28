@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>什么是MVCC - ZCCT</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="ZCCT"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ZCCT"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="全称Multi-Version Concurrency Control，即多版本并发控制，主要是为了提高数据库的并发性能。以下文章都是围绕InnoDB引擎来讲，因为myIsam不支持事务。"><meta property="og:type" content="blog"><meta property="og:title" content="什么是MVCC"><meta property="og:url" content="https://zcct123.github.io/2025/05/26/mysql/%E9%94%81%E4%B8%8E%E5%B9%B6%E5%8F%91/%E4%BB%80%E4%B9%88%E6%98%AFMVCC/"><meta property="og:site_name" content="ZCCT"><meta property="og:description" content="全称Multi-Version Concurrency Control，即多版本并发控制，主要是为了提高数据库的并发性能。以下文章都是围绕InnoDB引擎来讲，因为myIsam不支持事务。"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://zcct123.github.io/media/cover/mysql.png"><meta property="article:published_time" content="2025-05-26T04:00:00.000Z"><meta property="article:modified_time" content="2025-05-28T06:28:32.581Z"><meta property="article:author" content="zcct"><meta property="article:tag" content="锁与并发"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://zcct123.github.io/media/cover/mysql.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://zcct123.github.io/2025/05/26/mysql/%E9%94%81%E4%B8%8E%E5%B9%B6%E5%8F%91/%E4%BB%80%E4%B9%88%E6%98%AFMVCC/"},"headline":"什么是MVCC","image":["https://zcct123.github.io/media/cover/mysql.png"],"datePublished":"2025-05-26T04:00:00.000Z","dateModified":"2025-05-28T06:28:32.581Z","author":{"@type":"Person","name":"zcct"},"publisher":{"@type":"Organization","name":"ZCCT","logo":{"@type":"ImageObject","url":"https://zcct123.github.io/img/logo.svg"}},"description":"全称Multi-Version Concurrency Control，即多版本并发控制，主要是为了提高数据库的并发性能。以下文章都是围绕InnoDB引擎来讲，因为myIsam不支持事务。"}</script><link rel="canonical" href="https://zcct123.github.io/2025/05/26/mysql/%E9%94%81%E4%B8%8E%E5%B9%B6%E5%8F%91/%E4%BB%80%E4%B9%88%E6%98%AFMVCC/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">档案</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><div class="card-image"><span class="image is-7by3"><img class="fill" src="/media/cover/mysql.png" alt="什么是MVCC"></span></div><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2025-05-26T04:00:00.000Z" title="2025/5/26 12:00:00">2025-05-26</time>发表</span><span class="level-item"><time dateTime="2025-05-28T06:28:32.581Z" title="2025/5/28 14:28:32">2025-05-28</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/mysql/">mysql</a></span><span class="level-item">19 分钟读完 (大约2851个字)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>次访问</span></div></div><h1 class="title is-3 is-size-4-mobile">什么是MVCC</h1><div class="content"><blockquote>
+<p>全称Multi-Version Concurrency Control，即多版本并发控制，主要是为了提高数据库的并发性能。以下文章都是围绕InnoDB引擎来讲，因为myIsam不支持事务。</p>
+</blockquote>
+<span id="more"></span>
+<p>同一行数据平时发生读写请求时，会上锁阻塞住。但mvcc用更好的方式去处理读—写请求，做到在发生读—写请求冲突时不用加锁。</p>
+<p>这个读是指的快照读，而不是当前读，当前读是一种加锁操作，是悲观锁。</p>
+<p>那它到底是怎么做到读—写不用加锁的，快照读和当前读又是什么鬼，跟着你们的贴心老哥，继续往下看。</p>
+<h3 id="当前读、快照读都是什么鬼"><a href="#当前读、快照读都是什么鬼" class="headerlink" title="当前读、快照读都是什么鬼"></a>当前读、快照读都是什么鬼</h3><p>什么是MySQL InnoDB下的当前读和快照读？</p>
+<ul>
+<li><p>当前读<br>它读取的数据库记录，都是当前最新的版本，会对当前读取的数据进行加锁，防止其他事务修改数据。是悲观锁的一种操作。</p>
+<p>  如下操作都是当前读：</p>
+<ul>
+<li>select lock in share mode (共享锁)</li>
+<li>select for update (排他锁)</li>
+<li>update (排他锁)</li>
+<li>insert (排他锁)</li>
+<li>delete (排他锁)</li>
+<li>串行化事务隔离级别</li>
+</ul>
+</li>
+<li><p>快照读<br>快照读的实现是基于多版本并发控制，即MVCC，既然是多版本，那么快照读读到的数据不一定是当前最新的数据，有可能是之前历史版本的数据。</p>
+<p>  如下操作是快照读：</p>
+<ul>
+<li>不加锁的select操作（注：事务级别不是串行化）</li>
+</ul>
+</li>
+</ul>
+<h2 id="数据库并发场景"><a href="#数据库并发场景" class="headerlink" title="数据库并发场景"></a>数据库并发场景</h2><ul>
+<li><p>读-读：不存在任何问题，也不需要并发控制</p>
+</li>
+<li><p>读-写：有线程安全问题，可能会造成事务隔离性问题，可能遇到脏读，幻读，不可重复读</p>
+</li>
+<li><p>写-写：有线程安全问题，可能会存在更新丢失问题，比如第一类更新丢失，第二类更新丢失</p>
+</li>
+</ul>
+<h3 id="MVCC解决并发哪些问题？"><a href="#MVCC解决并发哪些问题？" class="headerlink" title="MVCC解决并发哪些问题？"></a>MVCC解决并发哪些问题？</h3><p>mvcc用来解决读—写冲突的无锁并发控制，就是为事务分配单向增长的时间戳。为每个数据修改保存一个版本，版本与事务时间戳相关联。</p>
+<p>读操作只读取该事务开始前的数据库快照。</p>
+<p>解决问题如下：</p>
+<ol>
+<li><p>并发读-写时：可以做到读操作不阻塞写操作，同时写操作也不会阻塞读操作。</p>
+</li>
+<li><p>解决脏读、幻读、不可重复读等事务隔离问题，但不能解决上面的写-写 更新丢失问题。</p>
+</li>
+</ol>
+<p>因此有了下面提高并发性能的组合拳：</p>
+<ol>
+<li><p>MVCC + 悲观锁：MVCC解决读写冲突，悲观锁解决写写冲突</p>
+</li>
+<li><p>MVCC + 乐观锁：MVCC解决读写冲突，乐观锁解决写写冲突</p>
+</li>
+</ol>
+<h2 id="MVCC的实现原理"><a href="#MVCC的实现原理" class="headerlink" title="MVCC的实现原理"></a>MVCC的实现原理</h2><p><strong>它的实现原理主要是版本链，undo日志 ，Read View 来实现的</strong></p>
+<h3 id="版本链"><a href="#版本链" class="headerlink" title="版本链"></a>版本链</h3><p>我们数据库中的每行数据，除了我们肉眼看见的数据，还有几个隐藏字段，得开天眼才能看到。分别是db_trx_id、db_roll_pointer、db_row_id。</p>
+<ul>
+<li><p>db_trx_id  事务id</p>
+<p>  6byte，最近修改(修改&#x2F;插入)事务ID：记录创建这条记录&#x2F;最后一次修改该记录的事务ID。</p>
+</li>
+<li><p>db_roll_pointer（版本链关键） 回滚指针</p>
+<p>  7byte，回滚指针，指向这条记录的上一个版本（存储于rollback segment里）</p>
+</li>
+<li><p>db_row_id 隐藏主键</p>
+<p>  6byte，隐含的自增ID（隐藏主键），如果数据表没有主键，InnoDB会自动以db_row_id产生一个聚簇索引。</p>
+</li>
+<li><p>实际还有一个删除flag隐藏字段, 记录被更新或删除并不代表真的删除，而是删除flag变了</p>
+</li>
+</ul>
+<p><img src="https://i-blog.csdnimg.cn/blog_migrate/ec5725b64565d668b16b6eab1c5afe20.png" alt="在这里插入图片描述"></p>
+<p>如上图，db_row_id是数据库默认为该行记录生成的唯一隐式主键，db_trx_id是当前操作该记录的事务ID，而db_roll_pointer是一个回滚指针，用于配合undo日志，指向上一个旧版本。</p>
+<p>每次对数据库记录进行改动，都会记录一条undo日志，每条undo日志也都有一个roll_pointer属性（INSERT操作对应的undo日志没有该属性，因为该记录并没有更早的版本），可以将这些undo日志都连起来，串成一个链表，所以现在的情况就像下图一样：<br><img src="https://i-blog.csdnimg.cn/blog_migrate/f4481be786ecb332c469ca710ae188c1.png" alt="在这里插入图片描述"></p>
+<p>对该记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链，版本链的头节点就是当前记录最新的值。另外，每个版本中还包含生成该版本时对应的事务id，这个信息很重要，在根据ReadView判断版本可见性的时候会用到。</p>
+<h3 id="undo日志"><a href="#undo日志" class="headerlink" title="undo日志"></a>undo日志</h3><p>Undo log 主要用于记录数据被修改之前的日志，在表信息修改之前先会把数据拷贝到undo log里。</p>
+<p>当事务进行回滚时可以通过undo log 里的日志进行数据还原。</p>
+<h3 id="Undo-log-的用途"><a href="#Undo-log-的用途" class="headerlink" title="Undo log 的用途"></a>Undo log 的用途</h3><pre><code>保证事务进行rollback时的原子性和一致性，当事务进行回滚的时候可以用undo log的数据进行恢复。
+
+用于MVCC快照读的数据，在MVCC多版本控制中，通过读取undo log的历史版本数据可以实现不同事务版本号都拥有自己独立的快照数据版本。
+</code></pre>
+<p>undo log主要分为两种：</p>
+<ol>
+<li><p>insert undo log</p>
+<p> 代表事务在insert新记录时产生的undo log , 只在事务回滚时需要，并且在事务提交后可以被立即丢弃</p>
+</li>
+<li><p>update undo log（主要）</p>
+<p> 事务在进行update或delete时产生的undo log ; 不仅在事务回滚时需要，在快照读时也需要；</p>
+<p> 所以不能随便删除，只有在快速读或事务回滚不涉及该日志时，对应的日志才会被purge线程统一清除</p>
+</li>
+</ol>
+<h3 id="Read-View-读视图"><a href="#Read-View-读视图" class="headerlink" title="Read View(读视图)"></a>Read View(读视图)</h3><p>事务进行快照读操作的时候生产的读视图(Read View)，在该事务执行的快照读的那一刻，会生成数据库系统当前的一个快照。</p>
+<p>记录并维护系统当前活跃事务的ID(没有commit，当每个事务开启时，都会被分配一个ID, 这个ID是递增的，所以越新的事务，ID值越大)，是系统中当前不应该被本事务看到的其他事务id列表。</p>
+<p>Read View主要是用来做可见性判断的, 即当我们某个事务执行快照读的时候，对该记录创建一个Read View读视图，把它比作条件用来判断当前事务能够看到哪个版本的数据，既可能是当前最新的数据，也有可能是该行记录的undo log里面的某个版本的数据。</p>
+<p>Read View几个属性</p>
+<ol>
+<li>trx_ids: 当前系统活跃(未提交)事务版本号集合。</li>
+<li>low_limit_id: 创建当前read view 时“当前系统最大事务版本号+1”。</li>
+<li>up_limit_id: 创建当前read view 时“系统正处于活跃事务最小版本号”</li>
+<li>creator_trx_id: 创建当前read view的事务版本号；</li>
+</ol>
+<p><strong>Read View可见性判断条件</strong></p>
+<ul>
+<li><p>db_trx_id &lt; up_limit_id || db_trx_id &#x3D;&#x3D; creator_trx_id（显示）</p>
+<p>  如果数据事务ID小于read view中的最小活跃事务ID，则可以肯定该数据是在当前事务启之前就已经存在了的,所以可以显示。<br>  或者数据的事务ID等于creator_trx_id ，那么说明这个数据就是当前事务自己生成的，自己生成的数据自己当然能看见，所以这种情况下此数据也是可以显示的。</p>
+</li>
+<li><p>db_trx_id &gt;&#x3D; low_limit_id（不显示）</p>
+<p>  如果数据事务ID大于read view 中的当前系统的最大事务ID，则说明该数据是在当前read view 创建之后才产生的，所以数据不显示。如果小于则进入下一个判断</p>
+</li>
+<li><p>db_trx_id是否在活跃事务（trx_ids）中</p>
+<p>  不存在：则说明read view产生的时候事务已经commit了，这种情况数据则可以显示。	<br>  已存在：则代表我Read View生成时刻，你这个事务还在活跃，还没有Commit，你修改的数据，我当前事务也是看不见的。</p>
+</li>
+</ul>
+<h2 id="MVCC和事务隔离级别"><a href="#MVCC和事务隔离级别" class="headerlink" title="MVCC和事务隔离级别"></a>MVCC和事务隔离级别</h2><p>上面所讲的Read View用于支持RC（Read Committed，读提交）和RR（Repeatable Read，可重复读）隔离级别的实现。</p>
+<h3 id="RR、RC生成时机"><a href="#RR、RC生成时机" class="headerlink" title="RR、RC生成时机"></a>RR、RC生成时机</h3><ul>
+<li>RC隔离级别下，是每个快照读都会生成并获取最新的Read View；</li>
+<li>在RR隔离级别下，则是同一个事务中的第一个快照读才会创建Read View, 之后的快照读获取的都是同一个Read View，之后的查询就不会重复生成了，所以一个事务的查询结果每次都是一样的。</li>
+</ul>
+<p>解决幻读问题</p>
+<ul>
+<li>快照读：通过MVCC来进行控制的，不用加锁。按照MVCC中规定的“语法”进行增删改查等操作，以避免幻读。</li>
+<li>当前读：通过next-key锁（行锁+gap锁）来解决问题的。</li>
+</ul>
+<h3 id="RC、RR级别下的InnoDB快照读区别"><a href="#RC、RR级别下的InnoDB快照读区别" class="headerlink" title="RC、RR级别下的InnoDB快照读区别"></a>RC、RR级别下的InnoDB快照读区别</h3><p>在RR级别下的某个事务的对某条记录的第一次快照读会创建一个快照及Read View， 将当前系统活跃的其他事务记录起来，此后在调用快照读的时候，还是使用的是同一个Read View，所以只要当前事务在其他事务提交更新之前使用过快照读，那么之后的快照读使用的都是同一个Read View，所以对之后的修改不可见；</p>
+<p>即RR级别下，快照读生成Read View时，Read View会记录此时所有其他活动事务的快照，这些事务的修改对于当前事务都是不可见的。而早于Read View创建的事务所做的修改均是可见</p>
+<p>而在RC级别下的，事务中，每次快照读都会新生成一个快照和Read View, 这就是我们在RC级别下的事务中可以看到别的事务提交的更新的原因</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>什么是MVCC</p><p><a href="https://zcct123.github.io/2025/05/26/mysql/锁与并发/什么是MVCC/">https://zcct123.github.io/2025/05/26/mysql/锁与并发/什么是MVCC/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>zcct</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2025-05-26</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-05-28</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/%E9%94%81%E4%B8%8E%E5%B9%B6%E5%8F%91/">锁与并发</a></div><!--!--></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/img/zfb.jpg" alt="支付宝"></span></a><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/img/wx.jpg" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2025/05/26/mysql/innodb/Mysql%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E3%80%91%20InnoDB%20%E7%9A%84%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%20/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">InnoDB 的逻辑存储结构</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2025/05/26/mysql/innodb/%E3%80%90Mysql%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E3%80%91InnoDB%20Checkpoint%E6%A6%82%E8%BF%B0/"><span class="level-item">InnoDB Checkpoint概述</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">评论</h3><script src="https://giscus.app/client.js" repo="zcct123/zcct123.github.io" data-repo="zcct123/zcct123.github.io" data-repo-id="R_kgDOOq7sDw" data-category-id="DIC_kwDOOq7sD84Cqqpz" data-category="Ideas" data-mapping="pathname" data-strict="0" data-reactions-enabled="0" data-emit-metadata="0" data-input-position="top" data-theme="noborder_light" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1 is-sticky"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="zcct"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">zcct</p><p class="is-size-6 is-block">zcct</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>中国</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">73</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">16</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://gitee.com/zclvct" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://gitee.com/zclvct"><i class="fab fa-github"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><ul class="menu-list"><li><a class="level is-mobile" href="#当前读、快照读都是什么鬼"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">当前读、快照读都是什么鬼</span></span></a></li></ul><li><a class="level is-mobile" href="#数据库并发场景"><span class="level-left"><span class="level-item">2</span><span class="level-item">数据库并发场景</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#MVCC解决并发哪些问题？"><span class="level-left"><span class="level-item">2.1</span><span class="level-item">MVCC解决并发哪些问题？</span></span></a></li></ul></li><li><a class="level is-mobile" href="#MVCC的实现原理"><span class="level-left"><span class="level-item">3</span><span class="level-item">MVCC的实现原理</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#版本链"><span class="level-left"><span class="level-item">3.1</span><span class="level-item">版本链</span></span></a></li><li><a class="level is-mobile" href="#undo日志"><span class="level-left"><span class="level-item">3.2</span><span class="level-item">undo日志</span></span></a></li><li><a class="level is-mobile" href="#Undo-log-的用途"><span class="level-left"><span class="level-item">3.3</span><span class="level-item">Undo log 的用途</span></span></a></li><li><a class="level is-mobile" href="#Read-View-读视图"><span class="level-left"><span class="level-item">3.4</span><span class="level-item">Read View(读视图)</span></span></a></li></ul></li><li><a class="level is-mobile" href="#MVCC和事务隔离级别"><span class="level-left"><span class="level-item">4</span><span class="level-item">MVCC和事务隔离级别</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#RR、RC生成时机"><span class="level-left"><span class="level-item">4.1</span><span class="level-item">RR、RC生成时机</span></span></a></li><li><a class="level is-mobile" href="#RC、RR级别下的InnoDB快照读区别"><span class="level-left"><span class="level-item">4.2</span><span class="level-item">RC、RR级别下的InnoDB快照读区别</span></span></a></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/java/"><span class="level-start"><span class="level-item">java</span></span><span class="level-end"><span class="level-item tag">30</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">7</span></span></a></li><li><a class="level is-mobile" href="/categories/python/"><span class="level-start"><span class="level-item">python</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/redis/"><span class="level-start"><span class="level-item">redis</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="level-start"><span class="level-item">分布式</span></span><span class="level-end"><span class="level-item tag">17</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen is-sticky"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3 is-sticky"><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><figure class="media-left"><a class="image" href="/2025/05/26/python/%E5%9F%BA%E7%A1%80/%E5%BA%8F%E5%88%97%E6%9E%84%E6%88%90%E7%9A%84%E6%95%B0%E7%BB%84/"><img src="/media/thumbnail/image.png" alt="序列构成的数组"></a></figure><div class="media-content"><p class="date"><time dateTime="2025-05-26T04:00:00.000Z">2025-05-26</time></p><p class="title"><a href="/2025/05/26/python/%E5%9F%BA%E7%A1%80/%E5%BA%8F%E5%88%97%E6%9E%84%E6%88%90%E7%9A%84%E6%95%B0%E7%BB%84/">序列构成的数组</a></p><p class="categories"><a href="/categories/python/">python</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2025/05/26/python/%E5%9F%BA%E7%A1%80/%E5%8F%8C%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%88Dunder%20Methods%EF%BC%89%E3%80%81%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95/"><img src="/media/thumbnail/image.png" alt="双下方法"></a></figure><div class="media-content"><p class="date"><time dateTime="2025-05-26T04:00:00.000Z">2025-05-26</time></p><p class="title"><a href="/2025/05/26/python/%E5%9F%BA%E7%A1%80/%E5%8F%8C%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%88Dunder%20Methods%EF%BC%89%E3%80%81%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95/">双下方法</a></p><p class="categories"><a href="/categories/python/">python</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2025/05/26/mysql/innodb/InnoDB%20%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84/"><img src="/media/thumbnail/mysql.png" alt="InnoDB 体系架构"></a></figure><div class="media-content"><p class="date"><time dateTime="2025-05-26T04:00:00.000Z">2025-05-26</time></p><p class="title"><a href="/2025/05/26/mysql/innodb/InnoDB%20%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84/">InnoDB 体系架构</a></p><p class="categories"><a href="/categories/mysql/">mysql</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2025/05/26/mysql/innodb/Mysql%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E3%80%91%20InnoDB%20%E7%9A%84%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/"><img src="/media/thumbnail/mysql.png" alt="InnoDB 的索引结构"></a></figure><div class="media-content"><p class="date"><time dateTime="2025-05-26T04:00:00.000Z">2025-05-26</time></p><p class="title"><a href="/2025/05/26/mysql/innodb/Mysql%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E3%80%91%20InnoDB%20%E7%9A%84%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/">InnoDB 的索引结构</a></p><p class="categories"><a href="/categories/mysql/">mysql</a></p></div></article><article class="media"><figure class="media-left"><a class="image" href="/2025/05/26/mysql/innodb/Mysql%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E3%80%91%20InnoDB%20%E7%9A%84%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%20/"><img src="/media/thumbnail/mysql.png" alt="InnoDB 的逻辑存储结构"></a></figure><div class="media-content"><p class="date"><time dateTime="2025-05-26T04:00:00.000Z">2025-05-26</time></p><p class="title"><a href="/2025/05/26/mysql/innodb/Mysql%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7%E3%80%91%20InnoDB%20%E7%9A%84%E9%80%BB%E8%BE%91%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%20/">InnoDB 的逻辑存储结构</a></p><p class="categories"><a href="/categories/mysql/">mysql</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2025/05/"><span class="level-start"><span class="level-item">五月 2025</span></span><span class="level-end"><span class="level-item tag">8</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/04/"><span class="level-start"><span class="level-item">四月 2025</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2024/09/"><span class="level-start"><span class="level-item">九月 2024</span></span><span class="level-end"><span class="level-item tag">63</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/09/"><span class="level-start"><span class="level-item">九月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/InnoDB/"><span class="tag">InnoDB</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/juc/"><span class="tag">juc</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/jvm/"><span class="tag">jvm</span><span class="tag">15</span></a></div><div class="control"><a class="tags has-addons" href="/tags/python%E5%9F%BA%E7%A1%80/"><span class="tag">python基础</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/redis/"><span class="tag">redis</span><span class="tag">17</span></a></div><div class="control"><a class="tags has-addons" href="/tags/sql%E4%BC%98%E5%8C%96/"><span class="tag">sql优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86/"><span class="tag">事务处理</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="tag">内存模型</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><span class="tag">垃圾回收</span><span class="tag">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="tag">多线程</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6/"><span class="tag">容错机制</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9E%B6%E6%9E%84%E5%AE%89%E5%85%A8%E6%80%A7/"><span class="tag">架构安全性</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD/"><span class="tag">类加载</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%80%8F%E6%98%8E%E5%A4%9A%E7%BA%A7%E5%88%86%E6%B5%81%E7%B3%BB%E7%BB%9F/"><span class="tag">透明多级分流系统</span><span class="tag">6</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%94%81%E4%B8%8E%E5%B9%B6%E5%8F%91/"><span class="tag">锁与并发</span><span class="tag">1</span></a></div></div></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="ZCCT" height="28"></a><p class="is-size-7"><span>&copy; 2025 zcct</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">共<span id="busuanzi_value_site_uv">0</span>个访客</span></p><p class="is-size-7">© 2019</p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
